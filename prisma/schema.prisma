@@ -19,7 +19,7 @@
 // Conventions:
 //   - PostgreSQL, single `public` schema (schema-level separation can be added
 //     later for least-privilege roles if needed — see SECURITY_REVIEW §2 DB access).
-//   - Timestamps: timestamptz (UTC) — PROPOSED (D-006/OQ-8 still open). Legacy
+//   - Timestamps: timestamptz (UTC) — approved target convention (D-018). Legacy
 //     wall-clock values are converted during ETL (UAE = fixed UTC+04, no DST,
 //     so conversion is deterministic). If the owner rejects UTC, switch these
 //     to @db.Timestamptz(3) -> timestamp(3) and keep wall-clock semantics.

@@ -135,7 +135,7 @@ Top items (full list in OPEN_QUESTIONS.md):
 ## Next recommended actions (priority order)
 
 1. Review/approve the Prisma draft's target-only choices: UTC timestamps, lockout duration, token expiry, and uniqueness policies.
-2. Confirm the remaining OQ-4 link-login parity choice and OQ-6/OQ-8/OQ-9 inputs.
+2. Confirm the remaining OQ-5 improvement policy and OQ-11 hosting/deployment inputs; OQ-4/OQ-6/OQ-8/OQ-9 are now decided.
 3. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
 4. Complete ARCH-03/04: API conventions, error model, and API specification for the 3 modules.
 5. Produce the MIG-04 reconciliation report before any ETL or migration work.

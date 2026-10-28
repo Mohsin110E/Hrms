@@ -164,7 +164,7 @@ These confirm data-loss-by-design paths in legacy ops; excluded from target; fla
 7. `WeeklyOffList.SiteId varchar(200)` CSV — normalize to a junction table.
 8. `usr.Profile` dropped-column gap (column_id 7) — EF EDMX mapping may skip a column; re-validate all EF mappings against live schema (done here — see §2/§3).
 9. Identity high-water marks to be recorded at cutover (all PKs are `bigint/smallint IDENTITY`).
-10. Case-insensitivity: legacy relies on CI collation (duplicate ShiftName check, UserName compare) — target needs `citext`/`lower()` indexes (D-006/OQ-8 for datetimes: legacy stores local wall-clock datetimes + client `TimeZone` header).
+10. Case-insensitivity: legacy relies on CI collation (duplicate ShiftName check, UserName compare) — target needs `citext`/`lower()` indexes. Datetime target convention is now UTC `timestamptz` with `APP_TIMEZONE` conversion (D-018).
 
 ## 8. DB-level security findings (new, from live inspection)
 
@@ -189,7 +189,7 @@ These confirm data-loss-by-design paths in legacy ops; excluded from target; fla
 | `varchar(5000)` AdditinalDocumentValue.Value | **`date` (expiry) / `text` (others)** | typed columns replace stringly-typed values (D-003) |
 | `bit` | `boolean` | |
 | `date` (IssueDate, ExpiryDate) | `date` | |
-| `datetime` (IssuedOn, LastLogin, CreatedOn) | `timestamp(3)` (wall-clock) — **timestamptz decision open (D-006/OQ-8)** | |
+| `datetime` (IssuedOn, LastLogin, CreatedOn) | `timestamptz(3)` after source-timezone conversion; `APP_TIMEZONE` controls display/boundaries (D-018) | |
 | `time` (Shift StartTime/EndTime) | `time` | |
 | `decimal/float` (payroll — out of scope) | `numeric` | flagged only |
 | TVP params (`DocumentType`, `DocumentExtraColumnType`, `DependantType`, `MenuItemType`) | JSON body → batched `createMany`/`$transaction` | |
@@ -208,6 +208,6 @@ These confirm data-loss-by-design paths in legacy ops; excluded from target; fla
 
 1. ~~Proc bodies~~ ✅ done (38/38 module-relevant dumped & read; full inventory in `discovery/procedures.csv` — remaining ~160 procs are leave/payroll/attendance, dump on demand per module in Phase 2).
 2. Confirm dedup decisions for duplicate usernames / Admin roles (business input — OQ-14).
-3. Datetime semantics decision (D-006/OQ-8) — legacy = local wall-clock + TimeZone header.
+3. Datetime conversion — source is legacy local wall-clock + TimeZone header; target conversion convention is UTC `timestamptz` + `APP_TIMEZONE` (D-018). Validate source timezone during ETL rehearsal.
 4. Scrub/protect `discovery/config_tables.csv` before any external sharing (contains encrypted PayrollPassword — value must stay redacted in docs).
 5. Remaining metadata rows (42 MetaData entries) beyond module-1..3 scope to be transcribed in Phase 2.

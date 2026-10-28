@@ -109,7 +109,8 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - `FormEntity`/`FormField` is the safe definitions layer; typed business models remain the write targets. Final API behavior is covered by ARCH-03/04.
 
 ### MD-03 — Determine phase-1 master set vs deferred
-- Priority: P2 · Status: **Not started** · Depends: MD-02, stakeholder input.
+- Priority: P2 · Status: **Done (D-019)** ·
+- Approved scope includes employee/document-supporting catalogs; leave/payroll/attendance/muster, airfare/comp-off, Excel import/payroll pipelines, and PMS/e-movers integrations are deferred, not deleted.
 
 ## DOC — Document Management
 

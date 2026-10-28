@@ -28,16 +28,15 @@ Append-only. Each entry: ID, date, decision, rationale, status (proposed/approve
 - Rationale: legacy DES-encrypted passwords cannot be verified offline; the approved backward-compatible forced-change flow is defined in D-014.
 
 ## D-006 — Time/date semantics in target schema
-- Date: 2026-10-28 · Status: **Open (OQ-8)**
-- Question: keep wall-clock `timestamp` semantics (legacy) vs normalize to `timestamptz` w/ UTC.
-- Note legacy already passes client `TimeZone` header — intended server usage unverified (proc bodies needed).
+- Date: 2026-10-28 · Status: **Superseded by D-018**
+- Decision: persist instants as UTC `timestamptz`; use deployment `APP_TIMEZONE` for display and local-date calculations.
 
 ## D-007 — Token/session mechanism for Next.js + NestJS
 - Date: 2026-10-28 · Status: **Approved for Phase 2 design**
 - Decision: short-lived JWT access token (15 min) + server-side revocable refresh session with enforced expiry & rotation; idle timeout ≤ legacy 180 min; logout revokes. Cookie vs header transport to be pinned in implementation phase (CSRF implications documented in SECURITY_REVIEW.md §2).
 
 ## D-008 — Replace static file serving with authenticated downloads
-- Date: 2026-10-28 · Status: **Proposed**
+- Date: 2026-10-28 · Status: **Approved by D-017**
 - Decision: private storage + signed short-lived URLs / streaming through authorized endpoint; no public preview via Google Docs viewer.
 - Rationale: SEC-L-04; also fixes preview-on-intranet breakage observed in legacy.
 
@@ -87,3 +86,20 @@ Append-only. Each entry: ID, date, decision, rationale, status (proposed/approve
   4. `EmployeeCode` uniqueness enforced (legacy had none at DB level).
   5. Stringly-typed dates in `AdditinalDocumentValue` parsed to real `date` columns during ETL.
 - Mechanism: reconciliation report generated first (MIG-04) for business sign-off, then ETL applies the fixes.
+
+## D-017 — Private folder document storage (OQ-6 answered)
+- Date: 2026-10-28 · Status: **Approved (owner via chat)**
+- Decision: store document files in a server folder outside the public web root. The application owns upload/download authorization; files are never served as static public assets. The target stores a generated private `storageKey`, original filename, MIME type, size, and checksum.
+- Rationale: preserves the operational simplicity of folder storage while fixing legacy unauthenticated `/Documents` exposure (SEC-L-04). The folder path is deployment configuration, not database data.
+
+## D-018 — Configured timezone with UTC persistence (OQ-8 answered)
+- Date: 2026-10-28 · Status: **Approved for target design (owner via chat)**
+- Decision: persist instants as UTC `timestamptz`; configure the business timezone using an environment variable such as `APP_TIMEZONE=Asia/Dubai`. The API converts UTC to that timezone for display and local-date calculations. Changing servers does not change stored time; only the deployment environment setting changes presentation/calculation behavior.
+- Rationale: avoids host-OS timezone drift while allowing the server/business timezone to be changed through deployment configuration. Date-only fields remain PostgreSQL `date` where no instant is intended.
+
+## D-019 — Phase-1 master-data scope (OQ-9 answered)
+- Date: 2026-10-28 · Status: **Approved (owner via chat)**
+- Decision: Phase 1 includes the masters required by User Management, Setup/Master Data, Employees, and Documents: Department, Site/Branch, Role, Language, UserType, generic Parameters/catalogs, DocumentType, EmployeeType, ContractType, Designation, Nationality/Country, VisaType, PassportType, MaritalStatus, Gender, BloodGroup, RelationType, SourceOfHire, Location, Shift, timezone configuration, Weekly-off, Holiday, metadata definitions/configuration, and their supporting form catalogs.
+- Modeling rule: use typed target models for real entities that need independent lifecycle/relations; use the definitions/Parameter catalogs for parameter-backed dropdowns. Missing/empty legacy catalogs are not invented.
+- Scope rule: nothing is deleted from legacy. Leave, payroll, attendance/muster, airfare/comp-off, Excel payroll/import pipelines, PMS/e-movers integrations, and their supporting domains are deferred to later phases.
+- Rationale: preserves all three requested modules and the employee/document workflows without expanding Phase 1 into the legacy leave/payroll platform.

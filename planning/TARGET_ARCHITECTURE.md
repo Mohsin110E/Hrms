@@ -46,7 +46,7 @@ Ownership rules only as in AGENTS.md §6; a task belongs to exactly one module; 
 - **Prisma models** in `prisma/schema.prisma` use camelCase with snake_case mapping. The Phase-2 draft has been validated against the discovered schema and proc behavior; it remains a design draft until the API/data-model review.
 - Keep the *definitions-driven* flexibility of the legacy metadata engine for master forms and document types, but re-implemented safely: the draft uses `FormEntity`/`FormField` (with field type catalog, validation metadata, and JSONB config), while business records remain typed models — **approved for Phase 2 by D-003**. No metadata value may generate SQL identifiers or SQL fragments.
 - Message codes preserved via `error_catalog` table mapping legacy `MessageId` → new code + text (keeps UI messages identical across cutover).
-- Timezone semantics decision pending (D-006/OQ-8); the Prisma draft currently uses UTC `timestamptz` as the working target convention.
+- Timezone: persist UTC `timestamptz`; use deployment `APP_TIMEZONE` for display and local-date calculations (D-018).
 
 ## 5. API conventions (summary — full spec in future API_SPECIFICATION.md)
 

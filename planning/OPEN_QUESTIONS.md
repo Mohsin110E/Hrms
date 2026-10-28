@@ -13,29 +13,30 @@ Each item: ID, question, why it matters, evidence gap, impact if unanswered.
 ## OQ-3 — Password migration strategy (D-005) — **RESOLVED (D-014)**
 - Answer 2026-10-28: **Backward compatibility with a forced password change**: legacy DES value verified server-side on first login, user prompted to set a new password; bcrypt thereafter; legacy column dropped after the migration window.
 
-## OQ-4 — Link-based auto-login (`?id=`, LinkId from PMS)
-- Question: is auto-login link parity required in phase 1 (PMS integration) or can it be deferred with standard login only?
-- Impact: PMS integration scope + security posture (SEC-L-10).
+## OQ-4 — Link-based auto-login (`?id=`, LinkId from PMS) — **RESOLVED: skip for now**
+- Answer 2026-10-28: **Defer link-based auto-login**. The target uses standard authentication only for now; PMS link-login can be reconsidered with the future PMS integration.
+- Impact: removes the insecure legacy passwordless URL flow from Phase 1 (SEC-L-10). Legacy `LinkId` data may be retained in migration staging but is not exposed by the target auth API.
 
 ## OQ-5 — Improvements allowed at cutover
 - Question: may the new app change UX for *actively broken/dangerous* legacy items (e.g., password display, apostrophe-stripping, POST-for-GET, permission model hardened beyond menu-visibility)? Suggest yes with no functional/regression.
 - Impact: scope discipline & parity test matrix.
 
-## OQ-6 — Document file storage target (D-008 dependency)
-- Question: on-prem directory vs cloud object storage (e.g., S3/Azure Blob)? Access pattern (in-app stream vs signed URLs)? Any on-prem constraint?
-- Impact: upload/download implementation, backup plan, migration WS-5.
+## OQ-6 — Document file storage target (D-008 dependency) — **RESOLVED: private folder**
+- Answer 2026-10-28: store files in a private server folder outside the public web root; access through authenticated application endpoints. Folder location is environment configuration.
+- Impact: upload/download implementation and backup plan; no public static serving or Google Docs preview.
 
 ## OQ-7 — PII / retention / compliance needs
 - Question: any UAE-specific retention requirements for employee documents/images/audit logs? Backup expectations? Who may view which document types (role matrix)?
 - Impact: document design + audit logging.
 
-## OQ-8 — Timezone semantics (D-006)
-- Question: legacy passes `TimeZone` header — confirm intended server behavior (proc bodies pending) and pick wall-clock vs UTC normalization for target schema.
-- Impact: schema types + all date calculations (reports, expiry alerts).
+## OQ-8 — Timezone semantics (D-006) — **RESOLVED for target design (D-018)**
+- Answer 2026-10-28: persist timestamps in UTC and set the business timezone through an environment variable (`APP_TIMEZONE`, initially expected to be `Asia/Dubai`). Convert for display and date-boundary calculations; do not depend on the host server timezone.
+- Impact: Prisma draft uses `timestamptz`; date-only business fields remain `date`.
 
-## OQ-9 — Phase-1 master list confirmation
-- Question: confirm which masters are release-1 (proposed: Department, Site/Branch, Role, Language, Employee/Contract type, Parameters, Shift master, Weekly-off, Holiday lists/config, Document types) vs deferred (e.g., Designation/Grade/Table-based configs if they exist only in metadata engine).
-- Impact: MD-03 scope and ETL workloads.
+## OQ-9 — Phase-1 master list confirmation — **RESOLVED (D-019)**
+- Answer 2026-10-28: approve the recommended list: Department, Site/Branch, Role, Language, UserType, Parameter catalogs, DocumentType, EmployeeType, ContractType, Designation, Nationality/Country, VisaType, PassportType, MaritalStatus, Gender, BloodGroup, RelationType, SourceOfHire, Location, Shift, timezone configuration, Weekly-off, Holiday, and metadata definitions/configuration.
+- Clarification: this is a scope decision, **not deletion**. Leave/payroll/attendance/muster, airfare/comp-off, Excel payroll/import pipelines, and PMS/e-movers integrations are deferred, not removed from the legacy system.
+- Impact: MD-03 and ETL scope are now fixed for Phase 2 design.
 
 ## OQ-10 — External integrations timeline
 - Question: PMS user push & e-movers attendance sync are out of phase-1; will employees created in the new system need PMS accounts immediately? Any interim bridge needed?
