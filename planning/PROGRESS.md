@@ -14,8 +14,9 @@
 | Auxiliary projects (services, CI/CD, docs) | **Reviewed** |
 | UAT database schema discovery | **Done** (2026-10-28 — live SELECT-only inspection under D-012; see DATABASE_DISCOVERY.md) |
 | Business rule extraction | **Done for phase-1 scope** (source + proc bodies + data evidence; see BUSINESS_RULES.md) |
-| Target architecture | **In progress** (proposal updated for Phase 2; D-003 metadata approach approved for draft) |
+| Target architecture | **In progress** (proposal updated for Phase 2; API spec complete; ready for dev scaffolding) |
 | Prisma target schema | **Done (draft/validated)** (`prisma/schema.prisma`, 37 models; Prisma validation clean) |
+| API specification | **Done (draft)** (`planning/API_SPECIFICATION.md`) |
 | Data migration plan | **In progress** (D-014/D-016 incorporated; reconciliation and storage decisions remain) |
 | Security review | **Reviewed** (source + DB-level findings SEC-L-15..19; see SECURITY_REVIEW.md) |
 | Test strategy | **In progress** (draft proposal) |
@@ -126,16 +127,17 @@ Top items (full list in OPEN_QUESTIONS.md):
 - ~~BLOCKER-1: UAT read-only credentials~~ → resolved via D-012 exception; still recommend a dedicated `hrms_ro` login for future sessions (OQ-1).
 - R-1: Password migration strategy is resolved by D-014: backward-compatible first login, mandatory password change, then bcrypt/argon2; legacy ciphertext removed after the migration window.
 - R-2: Metadata-driven dynamic SQL core = behavior fully embedded in DB procs & metadata rows (now extracted — seed data available).
-- R-3: AuthToken never expires; client-only timeout; token reuse — redesign in target (D-007).
+- R-3: Auth/session design resolved by D-007: short-lived JWT + revocable refresh sessions; legacy token reuse intentionally not reproduced.
 - R-4: ~~Business rule discovery depends on proc bodies~~ → done for phase-1 scope; ~160 out-of-scope procs remain for later phases.
-- R-5: External integration: PMS push, e-movers sync (`emoveapi`) — out of phase-1 scope but blocks clean API design of profile save.
-- R-6: Inactive/legacy code paths (commented Change/ForgotPassword) — clarify intent with users.
-- R-7 (new): data hygiene — duplicate usernames, duplicate Admin role, miscategorized FileDocs, stringly-typed dates must be resolved in ETL (OQ-14).
+- R-5: External integration: PMS push, e-movers sync (`emoveapi`) — out of phase-1 scope but flagged for profile-save API extensibility.
+- R-6: Forgot/change password resolved by D-013; link-login deferred by OQ-4.
+- R-7: Data hygiene resolution approved by D-016; reconciliation report before ETL.
+- R-8: Improvements allowed at cutover approved by D-020 (fix broken/dangerous items without functional regression).
+- R-9: Hosting/deployment deferred by D-021; scaffold uses env-driven config.
 
 ## Next recommended actions (priority order)
 
-1. Review/approve the Prisma draft's target-only choices: UTC timestamps, lockout duration, token expiry, and uniqueness policies.
-2. Confirm the remaining OQ-5 improvement policy and OQ-11 hosting/deployment inputs; OQ-4/OQ-6/OQ-8/OQ-9 are now decided.
-3. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
-4. Complete ARCH-03/04: API conventions, error model, and API specification for the 3 modules.
-5. Produce the MIG-04 reconciliation report before any ETL or migration work.
+1. **Start development scaffolding** (ARCH-01): NestJS modular monolith, Prisma client, config module, health endpoints, and the `auth` module login/session slice.
+2. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
+3. Produce the MIG-04 reconciliation report before any ETL or migration work.
+4. Iterate module-by-module against `API_SPECIFICATION.md` and `BUSINESS_RULES.md`.

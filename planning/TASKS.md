@@ -138,10 +138,10 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Pending: owner review of NEW decisions embedded in the draft (UTC timestamp semantics, Session lockout window, token retention/expiry, and target constraint enforcement); Prisma version bump when the project moves to a supported Node LTS.
 
 ### ARCH-03 — API conventions & error model (incl. MessageId mapping)
-- Priority: P2 · Status: **Not started**
+- Priority: P2 · Status: **Done** · Conventions embedded in `planning/API_SPECIFICATION.md` §1.
 
 ### ARCH-04 — API_SPECIFICATION.md for the 3 modules
-- Priority: P2 · Status: **Not started** · Depends: ARCH-01..03
+- Priority: P2 · Status: **Done** · Output: `planning/API_SPECIFICATION.md` — endpoints for auth/users/rbac, masters/employees, and documents.
 
 ## MIG — Data migration planning
 

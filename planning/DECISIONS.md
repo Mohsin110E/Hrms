@@ -97,6 +97,16 @@ Append-only. Each entry: ID, date, decision, rationale, status (proposed/approve
 - Decision: persist instants as UTC `timestamptz`; configure the business timezone using an environment variable such as `APP_TIMEZONE=Asia/Dubai`. The API converts UTC to that timezone for display and local-date calculations. Changing servers does not change stored time; only the deployment environment setting changes presentation/calculation behavior.
 - Rationale: avoids host-OS timezone drift while allowing the server/business timezone to be changed through deployment configuration. Date-only fields remain PostgreSQL `date` where no instant is intended.
 
+## D-020 — Improvements allowed at cutover (OQ-5 answered)
+- Date: 2026-10-28 · Status: **Approved (owner via chat)**
+- Decision: the new app may change UX for actively broken/dangerous legacy items (password display, apostrophe-stripping, POST-for-GET, permission model hardened beyond menu-visibility) as long as the business function is preserved and no regression is introduced.
+- Rationale: reproducing insecure or broken behavior would harm the target system and users. Parity tests measure business outcome, not pixel-for-pixel reproduction.
+
+## D-021 — Hosting/deployment target deferred (OQ-11 answered)
+- Date: 2026-10-28 · Status: **Deferred**
+- Decision: development proceeds locally without a fixed hosting/deployment target. The scaffold uses environment-driven configuration and containerization-ready defaults so the hosting choice can be made later without code changes.
+- Rationale: keeps the project moving; avoids premature infrastructure decisions.
+
 ## D-019 — Phase-1 master-data scope (OQ-9 answered)
 - Date: 2026-10-28 · Status: **Approved (owner via chat)**
 - Decision: Phase 1 includes the masters required by User Management, Setup/Master Data, Employees, and Documents: Department, Site/Branch, Role, Language, UserType, generic Parameters/catalogs, DocumentType, EmployeeType, ContractType, Designation, Nationality/Country, VisaType, PassportType, MaritalStatus, Gender, BloodGroup, RelationType, SourceOfHire, Location, Shift, timezone configuration, Weekly-off, Holiday, metadata definitions/configuration, and their supporting form catalogs.

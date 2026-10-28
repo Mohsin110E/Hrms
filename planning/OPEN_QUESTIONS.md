@@ -17,9 +17,9 @@ Each item: ID, question, why it matters, evidence gap, impact if unanswered.
 - Answer 2026-10-28: **Defer link-based auto-login**. The target uses standard authentication only for now; PMS link-login can be reconsidered with the future PMS integration.
 - Impact: removes the insecure legacy passwordless URL flow from Phase 1 (SEC-L-10). Legacy `LinkId` data may be retained in migration staging but is not exposed by the target auth API.
 
-## OQ-5 — Improvements allowed at cutover
-- Question: may the new app change UX for *actively broken/dangerous* legacy items (e.g., password display, apostrophe-stripping, POST-for-GET, permission model hardened beyond menu-visibility)? Suggest yes with no functional/regression.
-- Impact: scope discipline & parity test matrix.
+## OQ-5 — Improvements allowed at cutover — **RESOLVED: yes with no functional regression**
+- Answer 2026-10-28: **Yes** — the new app may fix actively broken/dangerous legacy items (password display, apostrophe-stripping, POST-for-GET, hardened permission model beyond menu-visibility, etc.) as long as the business function is preserved and no regression is introduced.
+- Impact: parity test matrix tests business outcome, not pixel-for-pixel or verb-for-verb legacy reproduction.
 
 ## OQ-6 — Document file storage target (D-008 dependency) — **RESOLVED: private folder**
 - Answer 2026-10-28: store files in a private server folder outside the public web root; access through authenticated application endpoints. Folder location is environment configuration.
@@ -42,9 +42,9 @@ Each item: ID, question, why it matters, evidence gap, impact if unanswered.
 - Question: PMS user push & e-movers attendance sync are out of phase-1; will employees created in the new system need PMS accounts immediately? Any interim bridge needed?
 - Impact: employee-save API design &-auto login mapping.
 
-## OQ-11 — Hosting/deployment targets for new stack
-- Question: where will staging/prod run (Linux server, Docker, cloud)? equals secrets management expectations?
-- Impact: ARCH-01 finalization & DATA_MIGRATION cutover design.
+## OQ-11 — Hosting/deployment targets for new stack — **DEFERRED**
+- Answer 2026-10-28: **Deferred**. Development proceeds locally; deployment/hosting decision will be made later.
+- Impact: local dev scaffold uses environment-driven config so the hosting choice can be plugged in later without code changes.
 
 ## OQ-12 — Legacy "Token reuse" behavior — **RESOLVED for target (D-007)**
 - Question: `GetLogin` may return an existing AuthToken — intended multi-device behavior or accident? Confirm expected multi-session behavior in the new system.
