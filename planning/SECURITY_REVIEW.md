@@ -32,7 +32,7 @@ Severity: 🔴 high / 🟠 medium / 🟡 low / INFO.
 | Area | Proposal |
 |---|---|
 | Password storage | **[proposed]** bcrypt cost ≥ 12 (or argon2id); no reversible crypto; per-user salt from hash string |
-| Password migration | **[open]** DES values cannot be verified → options: (a) forced reset-all at cutover; (b) on-login rehash: first login decrypts DES value server-side, verifies match, then hashes and upgrades row. Requires keeping legacy decrypt with restricted use and destroying after migration window. Needs decision (D-005, OQ-3). **DB evidence raises the stakes: SEC-L-15/16 mean decrypted credentials were routinely exposed — reset-all is the recommended default.** |
+| Password migration | **[approved: D-014]** Keep legacy DES ciphertext only during the migration window; verify it server-side on first login, force a password change, store bcrypt/argon2, then clear/drop the legacy value. The legacy decrypt path is never exposed to APIs and is removed after the window. SEC-L-15/16 mean the legacy values are treated as compromised. |
 | Sessions | **[proposed]** short-lived JWT access (15 min) + opaque refresh token (server-side, revocable, `expires_at` enforced, sliding idle expiry ≤ legacy 180 min), revoke on logout, token rotation, reuse detection |
 | AuthN flow | **[proposed]** strict whitelist for unauthenticated endpoints (`/auth/login`, `/auth/forgot-password`); account lockout with threshold from legacy proc evidence; rate limiting on login/forgot; failed-attempt audit preserved |
 | Password policy | **[proposed]** adopt legacy regex (BR-UM-10) server-side: 8–15 with upper/lower/digit/special — revisit length-first NIST-style policy with stakeholders **[open]** |

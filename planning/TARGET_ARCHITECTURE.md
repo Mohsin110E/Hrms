@@ -43,25 +43,25 @@ Ownership rules only as in AGENTS.md §6; a task belongs to exactly one module; 
 ## 4. Data architecture highlights
 
 - PostgreSQL database `hrms` (dev: `hrms_dev`) — **[proposed]** schemas per domain: `hrms.identity` etc.? Keep simple: single schema `public` with explicit `@map` names, statuses/params in lookup tables.
-- **Prisma models** in `prisma/schema.prisma` camelCase with snake_case mapping. Draft pending DB-04.
-- Keep the *definitions-driven* flexibility of the legacy metadata engine for master forms and document types, but re-implemented safely: tables `master_definition`, `master_field` (with field type catalog and validation metadata in JSONB), values in `master_item` (+ typed optional columns) — **[proposed alternative: per-master typed endpoints]**; final decision D-003 pending DB-03 evidence.
+- **Prisma models** in `prisma/schema.prisma` use camelCase with snake_case mapping. The Phase-2 draft has been validated against the discovered schema and proc behavior; it remains a design draft until the API/data-model review.
+- Keep the *definitions-driven* flexibility of the legacy metadata engine for master forms and document types, but re-implemented safely: the draft uses `FormEntity`/`FormField` (with field type catalog, validation metadata, and JSONB config), while business records remain typed models — **approved for Phase 2 by D-003**. No metadata value may generate SQL identifiers or SQL fragments.
 - Message codes preserved via `error_catalog` table mapping legacy `MessageId` → new code + text (keeps UI messages identical across cutover).
-- Timezone semantics decision pending (D-006).
+- Timezone semantics decision pending (D-006/OQ-8); the Prisma draft currently uses UTC `timestamptz` as the working target convention.
 
 ## 5. API conventions (summary — full spec in future API_SPECIFICATION.md)
 
 - REST, versioned `/api/v1`; GET for reads (legacy POST-only intentionally redesigned).
 - JSON: camelCase; envelopes `{ "data": ..., "message": { "code": "...", "text": "..." }, "pagination": { … } }`.
-- Auth: `Authorization: Bearer <access-token>`; refresh via httpOnly cookie or header (D-007 pending).
+- Auth: `Authorization: Bearer <access-token>`; refresh via httpOnly cookie or header (D-007 approved for design; transport choice still requires implementation review).
 - Validation failures → 400 with field-level errors; forbidden → 403; unauthenticated → 401; not-found → 404.
 - OpenAPI via `@nestjs/swagger`; UI at `/docs` (disabled in prod or secured).
 
 ## 6. Frontend architecture (Next.js)
 
 - App router, TypeScript strict; **no jQuery**; UI framework decision pending (stakeholder visual acceptance — new UI expected, but keep information architecture/labels of legacy) — [proposed] Tailwind + minimal headless components.
-- Auth via server-side session cookie + client auth context; Next middleware redirects (replaces per-component localStorage checks).
+- Auth via short-lived access token plus server-side refresh session; Next middleware redirects (replaces per-component localStorage checks).
 - Pages in scope: login, forgot/reset, site users, menu setup (admin), master setup screens (department/branch/role/etc.), employee list/form, shift master, weekly-off/holiday config, admin documents, my documents, document reports.
-- Preserve core UX flows (e.g., metadata-form-driven master screens) while removing dead flows (change password route may be **added as improvement** only if approved — OQ-5).
+- Preserve core UX flows (e.g., metadata-form-driven master screens) while replacing dead legacy flows with the approved forgot/change-password flows (D-013).
 
 ## 7. Background jobs
 

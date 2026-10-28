@@ -1,7 +1,7 @@
 # PROGRESS.md — HRMS Modernization Status
 
 **Last updated:** 2026-10-28
-**Current phase:** Phase 1 — Discovery (**complete for the 3 in-scope modules incl. live DB inspection**; awaiting review/approval to start Phase 2)
+**Current phase:** Phase 2 — Target design (**started after owner review; Prisma schema draft complete and under design review**)
 
 ## Overall completion
 
@@ -14,8 +14,9 @@
 | Auxiliary projects (services, CI/CD, docs) | **Reviewed** |
 | UAT database schema discovery | **Done** (2026-10-28 — live SELECT-only inspection under D-012; see DATABASE_DISCOVERY.md) |
 | Business rule extraction | **Done for phase-1 scope** (source + proc bodies + data evidence; see BUSINESS_RULES.md) |
-| Target architecture | **In progress** (proposal in TARGET_ARCHITECTURE.md; D-003 meta-engine validated by DB-03) |
-| Data migration plan | **In progress** (draft; type map + ETL reshaping validated by DB-02..07) |
+| Target architecture | **In progress** (proposal updated for Phase 2; D-003 metadata approach approved for draft) |
+| Prisma target schema | **Done (draft/validated)** (`prisma/schema.prisma`, 37 models; Prisma validation clean) |
+| Data migration plan | **In progress** (D-014/D-016 incorporated; reconciliation and storage decisions remain) |
 | Security review | **Reviewed** (source + DB-level findings SEC-L-15..19; see SECURITY_REVIEW.md) |
 | Test strategy | **In progress** (draft proposal) |
 | Implementation (Phase 4) | **Not started** — blocked until Phase 3 review approval |
@@ -115,7 +116,7 @@ Architecture: Angular 7.1 SPA + custom .NET API; SQL Server 2019; EF6 database-f
 
 - D-001: planning documents live in the NEW repo `D:\NodeJs\Swan\Hrms\planning`, legacy repo untouched.
 - D-002: modular monolith (NestJS) rather than microservices for phase 1.
-- D-003: keep metadata-driven master engine concept in target (definitions tables + JSONB, not dynamic SQL) — **validated feasible by DB-03 extracts**; final modeling call in Phase 2.
+- D-003: keep metadata-driven master engine concept in target (definitions tables + JSONB, not dynamic SQL) — **approved for the Phase-2 draft**.
 - D-004: superseded by D-012 — DB inspection performed under owner-authorized SELECT-only discipline (no read-only account available).
 
 ## Open questions / risks / blockers
@@ -123,7 +124,7 @@ Architecture: Angular 7.1 SPA + custom .NET API; SQL Server 2019; EF6 database-f
 Top items (full list in OPEN_QUESTIONS.md):
 
 - ~~BLOCKER-1: UAT read-only credentials~~ → resolved via D-012 exception; still recommend a dedicated `hrms_ro` login for future sessions (OQ-1).
-- R-1: Password migration strategy (DES values; **plaintext exposure confirmed at DB level → reset-all recommended**, OQ-3/D-005).
+- R-1: Password migration strategy is resolved by D-014: backward-compatible first login, mandatory password change, then bcrypt/argon2; legacy ciphertext removed after the migration window.
 - R-2: Metadata-driven dynamic SQL core = behavior fully embedded in DB procs & metadata rows (now extracted — seed data available).
 - R-3: AuthToken never expires; client-only timeout; token reuse — redesign in target (D-007).
 - R-4: ~~Business rule discovery depends on proc bodies~~ → done for phase-1 scope; ~160 out-of-scope procs remain for later phases.
@@ -133,8 +134,8 @@ Top items (full list in OPEN_QUESTIONS.md):
 
 ## Next recommended actions (priority order)
 
-1. **Review/approve Phase-1 discovery outputs** (this planning set) — gate for Phase 2.
-2. Decide OQ-3/D-005 (password migration: reset-all vs lazy rehash) and OQ-2/OQ-4 (forgot/change password, link-login parity) — both shape the auth design.
+1. Review/approve the Prisma draft's target-only choices: UTC timestamps, lockout duration, token expiry, and uniqueness policies.
+2. Confirm the remaining OQ-4 link-login parity choice and OQ-6/OQ-8/OQ-9 inputs.
 3. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
-4. Phase 2: ARCH-02 Prisma schema draft from DATABASE_DISCOVERY §9; DOC-04 document model; MD-02 master-data model over definitions tables; API_SPECIFICATION.md for the 3 modules.
-5. Draft dedup/cleanup report for business sign-off (duplicate usernames, Admin roles, FileDocTypeId repair) — feeds MIG-04.
+4. Complete ARCH-03/04: API conventions, error model, and API specification for the 3 modules.
+5. Produce the MIG-04 reconciliation report before any ETL or migration work.

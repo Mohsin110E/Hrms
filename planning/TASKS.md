@@ -45,9 +45,9 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Evidence: `discovery/procs/*.sql`, `discovery/view_*.sql`; rules §DOC.
 
 ### DISC-08 — Identify behavior gaps (commented-out / dead code)
-- Priority: P2 · Status: **In progress** ·
-- Items: ChangePassword (commented server), ForgotPassword (commented server; client modal calls active endpoint? verify), `/changePassword` dead link, `GetMenuAccessList` unused, `RememberMe` disabled.
-- Output → `OPEN_QUESTIONS.md`.
+- Priority: P2 · Status: **Done** ·
+- Items recorded: ChangePassword/ForgotPassword were commented out (now target scope via D-013), `/changePassword` dead link, `GetMenuAccessList` unused, `RememberMe` disabled.
+- Evidence/output → `OPEN_QUESTIONS.md`, `DECISIONS.md` D-013.
 
 ## DB — Read-only database schema analysis (done 2026-10-28 under D-012 SELECT-only exception)
 
@@ -90,14 +90,14 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Evidence: MODULE_INVENTORY.md §Module 1.
 
 ### UM-02 — Authentication redesign (bcrypt, JWT+refresh, expiry, lockout)
-- Priority: P1 · Status: **Not started** · Depends: DISC-05, DB-04, SEC review
-- Includes decision on password migration (see D-005 open, OPEN_QUESTIONS OQ-3).
+- Priority: P1 · Status: **In progress** (design fixed by D-014 legacy-compat flow + D-007 sessions; implemented in schema draft)
+- Password migration decided: **D-014** — legacy DES value verified server-side on first login → `mustChangePassword` prompt → bcrypt thereafter; `legacyPasswordEnc` dropped after window.
 
 ### UM-03 — Menu/rights model design
-- Priority: P1 · Status: **Not started** · Depends: DISC-05, UM-01
+- Priority: P1 · Status: **In progress** (MenuUserType base + MenuUserOverride modeled in schema; parity with GetSiteUserMenuItem logic)
 
 ### UM-04 — Forgot/change password flows (currently missing/commented)
-- Priority: P2 · Status: **Blocked (business decision OQ-2/OQ-5)**
+- Priority: P2 · Status: **Unblocked** (D-013: both flows are IN scope) — email token flow (forgot) + current-password-verified self change.
 
 ## MD — Setup / Master Data
 
@@ -105,7 +105,8 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Priority: P1 · Status: **Reviewed** · Evidence: MODULE_INVENTORY.md §Module 2.
 
 ### MD-02 — New master-data model design (definition-driven vs typed endpoints)
-- Priority: P1 · Status: **In progress** · Depends: DB-03 (metadata rows), ARCH-02.
+- Priority: P1 · Status: **Done (draft)** · Depends: DB-03 (metadata rows), ARCH-02.
+- `FormEntity`/`FormField` is the safe definitions layer; typed business models remain the write targets. Final API behavior is covered by ARCH-03/04.
 
 ### MD-03 — Determine phase-1 master set vs deferred
 - Priority: P2 · Status: **Not started** · Depends: MD-02, stakeholder input.
@@ -122,7 +123,7 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Priority: P2 · Status: **Not started** · Depends: DB-04 (scheduler procs)
 
 ### DOC-04 — Document data model (Document, FileDoc, FileDocMapping, type tables)
-- Priority: P1 · Status: **Not started (unblocked)** · DB-02/DB-04 complete — real model documented in DATABASE_DISCOVERY.md §4.
+- Priority: P1 · Status: **Done (draft)** · DB-02/DB-04 complete — target model is in `prisma/schema.prisma`; private storage and authorization details remain SEC-03/DOC-02.
 
 ## ARCH — Target architecture
 
@@ -130,7 +131,10 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Priority: P1 · Status: **In progress** · Evidence: TARGET_ARCHITECTURE.md
 
 ### ARCH-02 — Prisma schema draft for models in scope
-- Priority: P1 · Status: **Not started (unblocked)** · DB-02/03/04 complete — schema evidence in DATABASE_DISCOVERY.md.
+- Priority: P1 · Status: **Done (draft, validated)** · 2026-10-28
+- Output: `prisma/schema.prisma` — 37 models across the 3 modules, validated with `prisma format` and `prisma validate` (P1012 clean).
+- Conventions: `legacy:` comments map to legacy tables (IDs preserved), `NEW:` comments on additions with decision refs (D-003/D-007/D-014/D-015/D-016), `FIX:` on deliberate defect corrections.
+- Pending: owner review of NEW decisions embedded in the draft (UTC timestamp semantics, Session lockout window, token retention/expiry, and target constraint enforcement); Prisma version bump when the project moves to a supported Node LTS.
 
 ### ARCH-03 — API conventions & error model (incl. MessageId mapping)
 - Priority: P2 · Status: **Not started**
@@ -144,13 +148,14 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Priority: P2 · Status: **In progress** · Evidence: DATA_MIGRATION_PLAN.md (draft)
 
 ### MIG-02 — Password migration strategy decision record
-- Priority: P1 · Status: **Blocked (needs business decision OQ-3)**
+- Priority: P1 · Status: **Done (D-014)** — backward-compatible legacy verification with mandatory password change, then bcrypt/argon2; legacy ciphertext removed after migration window.
 
 ### MIG-03 — File-storage migration (path conventions, GUID/timestamp names → new store)
 - Priority: P2 · Status: **Not started**
 
 ### MIG-04 — Reconciliation & validation queries (read-only probes)
-- Priority: P2 · Status: **Not started** · Depends: DB-06
+- Priority: P2 · Status: **In progress** · Depends: DB-06
+- Scope fixed by D-016: duplicate usernames, duplicate Admin role, FileDoc type repair, EmployeeCode uniqueness, and document date conversion report before ETL.
 
 ## SEC — Security review
 

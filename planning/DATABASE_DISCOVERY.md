@@ -197,7 +197,7 @@ These confirm data-loss-by-design paths in legacy ops; excluded from target; fla
 
 ## 10. Migration implications (feeds DATA_MIGRATION_PLAN)
 
-1. **Reversible-encryption + plaintext-password-in-UI** → password strategy decision (D-005/OQ-3) is now the **critical-path item**: lazy rehash requires the legacy DES key at runtime; reset-all avoids it. `GetSiteUserDataList` proves decrypted passwords were shipped to clients — assume compromise; reset-all is the safer recommendation.
+1. **Reversible-encryption + plaintext-password-in-UI** → D-014 is approved: keep legacy DES ciphertext only for a migration window, verify server-side on first login, force a password change, then clear/drop it. `GetSiteUserDataList` proves decrypted passwords were shipped to clients — treat all legacy values as compromised; never expose the decrypt path through the new API.
 2. **Expiry data reshaping**: ETL must pivot `AdditinalDocumentValue` (DataTypeId 17) → `Document.ExpiryDate`, parsing dd/mm-yyyy strings (3,125 values, 0 unparsable today).
 3. **Uniqueness enforcement** (UserName ×3 dups, EmployeeCode) must be resolved pre-cutover with a dedup report for the business.
 4. **File↔type repair**: derive FileDocTypeId from mappings; orphaned files on disk after DeleteDocument → reconcile file store vs DB during migration (MIG-03).

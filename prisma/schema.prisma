@@ -1,0 +1,944 @@
+// ============================================================================
+// HRMS Modernization — Prisma Schema DRAFT (Phase 2, ARCH-02)
+// ============================================================================
+// Status: DRAFT — design artifact for review. No migration has been run.
+// Source of truth: planning/DATABASE_DISCOVERY.md (live legacy schema evidence)
+//                  planning/BUSINESS_RULES.md (behavior contracts)
+// Scope: Phase-1 modules only — User Management, Setup/Master Data, Documents.
+//
+// COMMENT CONVENTIONS (read me):
+//   /// legacy: ...  — maps 1:1 to a legacy table/column; IDs are PRESERVED
+//                      so the ETL can migrate rows without renumbering.
+//   // NEW: ...     — an addition that does NOT exist in the legacy system
+//                      (new table, new column, new constraint, or changed
+//                      semantics). Every NEW element carries the decision ID
+//                      (DECISIONS.md) that justifies it.
+//   // FIX: ...     — a deliberate correction of a legacy defect.
+//   // OUT-OF-SCOPE — column kept only for data parity; not used by phase-1 APIs.
+//
+// Conventions:
+//   - PostgreSQL, single `public` schema (schema-level separation can be added
+//     later for least-privilege roles if needed — see SECURITY_REVIEW §2 DB access).
+//   - Timestamps: timestamptz (UTC) — PROPOSED (D-006/OQ-8 still open). Legacy
+//     wall-clock values are converted during ETL (UAE = fixed UTC+04, no DST,
+//     so conversion is deterministic). If the owner rejects UTC, switch these
+//     to @db.Timestamptz(3) -> timestamp(3) and keep wall-clock semantics.
+//   - Catalog tables (UserType, Role, Parameter, DocumentType, Message) keep
+//     legacy integer IDs as primary keys — they are business-editable data,
+//     NOT enums, because users can add values at runtime in legacy.
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// MODULE 1 — USER MANAGEMENT
+// ============================================================================
+
+/// legacy: master.UserType (4 rows: 1=Executive, 2=Manager, 3=SystemAdmin, 4=HRAdmin)
+/// Legacy IDs preserved; menu visibility is keyed off this table (BR-UM-20/29).
+model UserType {
+  id              Int                      @id @default(autoincrement())
+  name            String                   @unique
+  isActive        Boolean                  @default(true)
+  displayOrder    Int                      @default(0)
+  users           User[]
+  menuPermissions MenuUserTypePermission[]
+
+  @@map("user_types")
+}
+
+/// legacy: master.Role (Admin/Manager/Employee + duplicated "Admin").
+/// FIX (D-016): legacy had two rows named "Admin" (RoleId 1 & 7) and NO unique
+/// constraint; dedup happens in ETL and `name` is unique here.
+/// NOTE: in legacy this table is vestigial for menus (UserType drives access,
+/// BR-UM-29) but is referenced by Profile/Employee metadata; kept for parity.
+/// (No FK exists between Role and Profile in the legacy DB — none modeled.)
+model Role {
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  isActive Boolean @default(true)
+
+  @@map("roles")
+}
+
+/// legacy: usr.Profile (852 rows) — the central "person" record.
+/// FIX (D-015): legacy stored PassportNo/EmiratesId/MOLNo/VisaNo as PLAINTEXT
+/// varchar(50). Here every PII identity number is stored twice:
+///   * `xxxEnc`  — AES-256-GCM ciphertext (application-level envelope
+///                 encryption; keys in env/KMS, never in the DB).
+///   * `xxxHash` — keyed HMAC-SHA256 of the normalized value, used ONLY for
+///                 equality lookups (ciphertext can't be searched). Indexed,
+///                 non-unique (two profiles may legitimately share a number,
+///                 e.g. dependants).
+/// APIs must never return `*Enc` in lists (mask last-4 via decrypted view).
+model Profile {
+  id                 Int       @id @default(autoincrement())
+  /// legacy: UserTypeId_1 — legacy kept a user-type copy on Profile; likely
+  /// redundant with User.userTypeId. Kept nullable only for ETL parity.
+  userTypeId         Int?
+  /// legacy: StatusId -> system.Parameter (4=Active, 5=Inactive)
+  statusId           Int?
+  /// legacy: CutomerId (sic) — legacy typo; meaning unresolved (OQ-15 follow-up).
+  /// Kept nullable for ETL parity; do not expose in APIs.
+  customerId         Int?
+  name               String
+  middleName         String?
+  lastName           String?
+  /// Legacy duplicate-email checks were proc-level. Target validation should
+  /// normalize emails case-insensitively; a final uniqueness policy remains a
+  /// migration/business decision because the legacy DB has no email UQ.
+  email              String?
+  contactNo          String?
+  dateOfBirth        DateTime? @db.Date
+  /// legacy: MaritalStatus/Gender/BloodGroup/MotherTongue/Nationality/VisaType ->
+  /// system.Parameter catalog values (kept as FKs, IDs preserved)
+  maritalStatusId    Int?
+  genderId           Int?
+  motherTongueId     Int?
+  bloodGroupId       Int?
+  nationalityId      Int?
+  visaTypeId         Int?
+  /// legacy: PhotoId -> master.FileDoc
+  photoFileId        BigInt?
+  address            String?   @db.Text
+  /// legacy: LinkId — external PMS identifier used for link auto-login (427 rows).
+  /// NEW: nullable + unique — legacy had neither constraint nor uniqueness.
+  linkId             Int?      @unique
+  isSiteAccess       Boolean   @default(false)
+  qualification      String?   @db.Text
+  homeCountryAddress String?   @db.Text
+  homeCountryPhoneNo String?
+  contractTypeId     Int?
+  dateOfExit         DateTime? @db.Timestamptz(3)
+  exitReasonCode     Int?
+  exitRemarks        String?   @db.Text
+  dateOfRejoining    DateTime? @db.Timestamptz(3)
+  // ---- PII identity numbers (ENCRYPTED — see model docblock) ----
+  passportNoEnc      String?
+  passportNoHash     String?
+  emiratesIdEnc      String?
+  emiratesIdHash     String?
+  molNoEnc           String?
+  molNoHash          String?
+  visaNoEnc          String?
+  visaNoHash         String?
+
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  /// legacy: CreatedBy/CreatedDate mapped to createdById/createdAt.
+  createdById Int?
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  user            User?
+  employee        Employee?
+  photoFile       StoredFile?            @relation("ProfilePhoto", fields: [photoFileId], references: [id])
+  uploadedFiles   StoredFile[]           @relation("UploadedFiles")
+  departments     ProfileDepartment[]
+  dependantsOwned Dependant[]            @relation("DependantProfile")
+  dependantsOf    Dependant[]            @relation("EmployeeProfile")
+  documents       Document[]
+  weeklyOffs      WeeklyOffAssignment[]
+  holidays        HolidayCalendarEntry[]
+  bankAccount     BankAccount?
+  // NOT migrated from legacy Profile: `IsUpdated` (app-level dirty flag, no
+  // business meaning found); column_id 7 was dropped in legacy (schema drift).
+
+  @@index([statusId])
+  @@index([passportNoHash])
+  @@index([emiratesIdHash])
+  @@index([molNoHash])
+  @@index([visaNoHash])
+  @@map("profiles")
+}
+
+/// legacy: usr.SiteUser (510 rows) — ONLY has SiteUserId/ProfileId/UserTypeId/
+/// UserName/Password in legacy. All login logic redesign lives here.
+model User {
+  id                 Int      @id @default(autoincrement())
+  profileId          Int      @unique
+  userTypeId         Int
+  /// FIX (D-016): unique — legacy had NO unique constraint and 3 duplicate
+  /// usernames in live data. Dedup resolved during ETL before this constraint
+  /// is created. Case-insensitive match: store lowercase (app normalizes) or
+  /// add `citext` extension in the initial migration (comment either way).
+  username           String   @unique
+  /// NEW (D-014): bcrypt/argon2 hash. Legacy stored DES-encrypted values; the
+  /// legacy ciphertext lives in `legacyPasswordEnc` (below), never here.
+  passwordHash       String?
+  /// NEW (D-014): backward-compat column holding the legacy DES-encrypted
+  /// password during the migration window ONLY. Login flow: if passwordHash
+  /// is null and this is set -> decrypt server-side, verify, set
+  /// mustChangePassword=true. Cleared when the user sets a new password.
+  /// DROP THIS COLUMN after the migration window (documented in D-014).
+  legacyPasswordEnc  String?
+  /// NEW (D-014): forces the change-password prompt on first legacy login.
+  mustChangePassword Boolean  @default(false)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime @updatedAt @db.Timestamptz(3)
+
+  profile             Profile              @relation(fields: [profileId], references: [id])
+  userType            UserType             @relation(fields: [userTypeId], references: [id])
+  sessions            Session[]            @relation("UserSessions")
+  activity            UserActivity?        @relation("Activity")
+  activityLogs        ActivityLog[]        @relation("ActivityLogs")
+  overrides           MenuUserOverride[]
+  oneTimeTokens       OneTimeLoginToken[]
+  passwordResetTokens PasswordResetToken[]
+
+  @@map("users")
+}
+
+/// legacy: usr.SiteUserActivity (123 rows)
+/// Behavior preserved (BR-UM-03): lock after 5 consecutive failed attempts,
+/// reset counter on success.
+/// NEW: `lockedUntil` — legacy locked users FOREVER with no unlock path
+/// (admin had to edit the DB). Target adds an auto-unlock window (default
+/// 30 min, configurable) — requires owner sign-off on the duration (see
+/// BUSINESS_RULES BR-UM-03 comment).
+model UserActivity {
+  id                   Int       @id @default(autoincrement())
+  userId               Int       @unique
+  lastLoginAt          DateTime? @db.Timestamptz(3)
+  lastIpUsed           String?
+  passwordChangedAt    DateTime? @db.Timestamptz(3)
+  isPasswordReset      Boolean   @default(false)
+  failedLoginAttempts  Int       @default(0)
+  isLocked             Boolean   @default(false)
+  failedLoginAttemptAt DateTime? @db.Timestamptz(3)
+  /// NEW: see model docblock. Null = permanent (legacy behavior).
+  lockedUntil          DateTime? @db.Timestamptz(3)
+
+  user User @relation("Activity", fields: [userId], references: [id])
+
+  @@map("user_activities")
+}
+
+/// NEW — D-013 (forgot-password flow).
+/// Legacy had no active reset-token table: the flow was commented out. Store
+/// only a hash of the emailed one-time token; the raw token exists only in the
+/// email URL. Tokens are short-lived, single-use, and invalidated after a
+/// successful password change. Requests and completion are audit logged.
+model PasswordResetToken {
+  id          BigInt    @id @default(autoincrement())
+  userId      Int
+  tokenHash   String    @unique
+  createdAt   DateTime  @default(now()) @db.Timestamptz(3)
+  expiresAt   DateTime  @db.Timestamptz(3)
+  usedAt      DateTime? @db.Timestamptz(3)
+  requestedIp String?
+  usedIp      String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, expiresAt])
+  @@map("password_reset_tokens")
+}
+
+/// legacy: usr.SiteUserActivityLog (33,508 rows — ONLY "Login" events exist).
+/// FIX (SEC-L-12 target): also log failed attempts, logouts, password
+/// changes/resets — legacy never recorded them.
+model ActivityLog {
+  id        BigInt   @id @default(autoincrement())
+  userId    Int
+  /// legacy: LogTypeId -> system.Parameter (ParameterTypeId 3). Legacy only
+  /// ever wrote 6=Login. Kept as FK to Parameter so admins can extend types.
+  logTypeId Int
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  user User @relation("ActivityLogs", fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([logTypeId])
+  @@map("activity_logs")
+}
+
+/// NEW — DECISION D-007.
+/// Replaces legacy `system.Token` (opaque GUID, ExpiresOn=IssuedOn => never
+/// expires, validated by existence only, returned/reused across logins).
+/// Target: short-lived JWT access token (stateless, NOT stored) + this table
+/// holds only the REFRESH session: hashed token, hard expiry, rotation and
+/// revocation. Legacy token-reuse behavior (BR-UM-05) is intentionally NOT
+/// reproduced — each login creates a new session (multi-device OK, OQ-12).
+model Session {
+  id               BigInt    @id @default(autoincrement())
+  userId           Int
+  /// SHA-256 of the refresh token; raw token never stored.
+  refreshTokenHash String    @unique
+  issuedAt         DateTime  @default(now()) @db.Timestamptz(3)
+  expiresAt        DateTime  @db.Timestamptz(3)
+  lastUsedAt       DateTime  @db.Timestamptz(3)
+  /// NEW: rotation support — when a refresh token is used it is marked
+  /// rotated and replaced; reuse of a rotated token revokes the session
+  /// (theft detection).
+  rotatedAt        DateTime? @db.Timestamptz(3)
+  revokedAt        DateTime? @db.Timestamptz(3)
+  revokedReason    String?
+  ipAddress        String?
+  userAgent        String?
+
+  user User @relation("UserSessions", fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+/// NEW — replaces legacy `HRMS.Token` (4 rows; one-time link-login token).
+/// Legacy: GetLogin deleted the row on use (delete-on-use "audit").
+/// FIX: kept with usedAt/usedIp for an audit trail instead of deleting,
+/// plus a hard expiry (legacy rows never expired).
+model OneTimeLoginToken {
+  id        BigInt    @id @default(autoincrement())
+  userId    Int
+  tokenHash String    @unique
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  /// NEW: legacy tokens were valid forever until used.
+  expiresAt DateTime  @db.Timestamptz(3)
+  usedAt    DateTime? @db.Timestamptz(3)
+  usedIp    String?
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("one_time_login_tokens")
+}
+
+/// NEW — append-only audit trail (SECURITY_REVIEW §2 Audit logging).
+/// Legacy had no audit beyond login events; target audits logins, lockouts,
+/// password changes/resets, document view/download/upload/delete, master
+/// data changes. This table is written by app code only; no API mutates it.
+model AuditLog {
+  id             BigInt   @id @default(autoincrement())
+  /// Actor = acting profile (null for system/scheduler actions).
+  actorProfileId Int?
+  action         String
+  entityType     String?
+  entityId       String?
+  ipAddress      String?
+  /// Action-specific payload (e.g. masked PII, old/new value hashes).
+  metadata       Json?
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([actorProfileId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+/// legacy: system.MenuItem — menu tree (Employee List=1, Master Setup=2,
+/// Department=6, Site=7, ... PageUrl like /profilelist, /mastersetup).
+/// Menu IDs are hardcoded in the legacy Angular Constants.ts; they are
+/// preserved exactly so the new frontend can adopt DB-driven menus without
+/// renumbering (BR-UM-24).
+model MenuItem {
+  /// legacy: IDs are preserved exactly (frontend Constants.ts hardcodes them,
+  /// BR-UM-24); autoincrement continues the sequence for NEW menu items.
+  id           Int     @id @default(autoincrement())
+  /// legacy: MenuParentValue — self-reference builds the tree.
+  parentId     Int?
+  name         String
+  pageUrl      String?
+  iconClass    String?
+  displayOrder Int
+  isMainMenu   Boolean @default(true)
+  isActive     Boolean @default(true)
+
+  parent              MenuItem?                @relation("MenuTree", fields: [parentId], references: [id])
+  children            MenuItem[]               @relation("MenuTree")
+  userTypePermissions MenuUserTypePermission[]
+  userOverrides       MenuUserOverride[]
+
+  @@map("menu_items")
+}
+
+/// legacy: system.MenuUserType — base menu rights per UserType
+/// (PageUrl override + IsCreate/IsEdit/IsDelete toolbar flags).
+/// Legacy save path was a MERGE proc (AddUpdateMenuUserType) -> plain upsert here.
+model MenuUserTypePermission {
+  id              Int     @id @default(autoincrement())
+  userTypeId      Int
+  menuItemId      Int
+  /// legacy: per-UserType PageUrl override (falls back to MenuItem.pageUrl).
+  pageUrlOverride String?
+  isCreate        Boolean @default(false)
+  isEdit          Boolean @default(false)
+  isDelete        Boolean @default(false)
+
+  userType UserType @relation(fields: [userTypeId], references: [id])
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+
+  @@unique([userTypeId, menuItemId])
+  @@map("menu_user_type_permissions")
+}
+
+/// legacy: system.MenuSpecialUserAccess — per-USER include/exclude overrides
+/// applied on top of the UserType base rights (GetSiteUserMenuItem logic).
+model MenuUserOverride {
+  id              Int     @id @default(autoincrement())
+  userId          Int
+  menuItemId      Int
+  /// legacy: isInclude bit — true = grant to this user, false = revoke.
+  isInclude       Boolean
+  pageUrlOverride String?
+
+  user     User     @relation(fields: [userId], references: [id])
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id])
+
+  @@unique([userId, menuItemId])
+  @@map("menu_user_overrides")
+}
+
+/// legacy: system.Message — message catalog.
+/// DECISION D-010: MessageIds are preserved verbatim (2=invalid login, 4=success,
+/// 5=updated, 6=email exists, 7=employee code exists, 10=holiday exists,
+/// 11/12=WOF conflicts, 28=shift exists, ...) so existing frontend wording and
+/// E2E parity tests keep working. `code` (NEW) is the stable string slug the
+/// new frontend keys off; `text` keeps the legacy wording at cutover.
+model Message {
+  /// legacy MsgId preserved verbatim (D-010); sequence continues for new codes.
+  id            Int     @id @default(autoincrement())
+  code          String  @unique
+  text          String
+  shortDesc     String?
+  /// legacy: MessageTypeId -> system.Parameter (7=Error, 8=Warning, 9=Success)
+  messageTypeId Int
+  displayOrder  Int     @default(0)
+
+  @@map("messages")
+}
+
+/// legacy: system.Configuration (25 rows: CompOff expiry, PayrollMonth,
+/// RamadanDates, ...). Config 13 "PayrollPassword" is a SECRET and is NOT
+/// migrated — it goes to the secret manager (SEC-L-19).
+/// NEW: `valueKind` tag so the app can coerce values safely instead of
+/// stringly-typed parsing everywhere.
+model SystemConfiguration {
+  /// legacy ConfigId preserved (1..25 seeded); sequence continues.
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  value       String?
+  valueDate   DateTime? @db.Date
+  /// NEW: string|number|date|secret (secret values are rejected at seed time).
+  valueKind   String    @default("string")
+  description String?
+
+  @@map("system_configurations")
+}
+
+/// legacy: system.ParameterType (1=UserType, 2=UserStatus, 3=LogType,
+/// 4=MessageType, 5=Data Type, 6=Field Data Type, 8=PassportType, ...)
+model ParameterType {
+  /// legacy ParameterTypeId preserved (1,2,3,4,5,6,8,...).
+  id         Int         @id @default(autoincrement())
+  name       String      @unique
+  parameters Parameter[]
+
+  @@map("parameter_types")
+}
+
+/// legacy: system.Parameter — the generic catalog behind every dropdown
+/// (gender, blood group, marital status, passport type, log types, ...).
+/// Legacy IDs preserved everywhere (Profile.genderId -> ParameterId 33/34/35).
+model Parameter {
+  id              Int     @id @default(autoincrement())
+  parameterTypeId Int
+  text            String
+  /// legacy: ParameterValue — legacy semantic value (e.g. StatusId 4 maps to
+  /// ParameterValue 1 "Active"). Preserved for ETL parity; app logic reads
+  /// `text`/code, never assumes the numeric value.
+  parameterValue  Int?
+  displayOrder    Int     @default(0)
+  /// legacy: Visibility — hidden options stay in data but are filtered out.
+  isVisible       Boolean @default(true)
+  /// NEW: stable slug for new code (legacy only had text).
+  code            String?
+
+  parameterType ParameterType @relation(fields: [parameterTypeId], references: [id])
+
+  @@unique([parameterTypeId, text])
+  @@index([parameterTypeId])
+  @@map("parameters")
+}
+
+// ============================================================================
+// MODULE 2 — SETUP / MASTER DATA
+// ============================================================================
+
+/// legacy: master.Department (8 rows, UQ DepartmentName in legacy too)
+model Department {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  profiles ProfileDepartment[]
+
+  @@map("departments")
+}
+
+/// legacy: master.Site (4 rows: Dubai Head Office, Abudhabi, Nepal, India)
+/// No unique constraint existed in legacy; name unique is NEW (FIX, D-016 spirit).
+model Site {
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  isActive Boolean @default(true)
+
+  employees        Employee[]
+  weeklyOffConfigs WeeklyOffConfig[]
+  holidayLists     HolidayList[]
+
+  @@map("sites")
+}
+
+/// legacy: master.Language (UQ LanguageName in legacy too)
+model Language {
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  isActive Boolean @default(true)
+
+  @@map("languages")
+}
+
+/// legacy: master.Shift (ShiftName/StartTime/EndTime/LateMinutes/
+/// HalfDayMinutes/Alt times; times are `time` columns in legacy too).
+/// FIX: name unique — legacy checked duplicates only inside the proc (race-
+/// prone, BR-MD-05); MsgId 28 is the legacy duplicate error.
+model Shift {
+  id             Int       @id @default(autoincrement())
+  name           String    @unique
+  startTime      DateTime  @db.Time
+  endTime        DateTime  @db.Time
+  lateMinutes    Int
+  halfDayMinutes Int
+  /// legacy: AltStartTime/AltEndTime (present in table, unused by phase-1 UI)
+  altStartTime   DateTime? @db.Time
+  altEndTime     DateTime? @db.Time
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now()) @db.Timestamptz(3)
+  createdById    Int?
+  updatedAt      DateTime  @updatedAt @db.Timestamptz(3)
+
+  employees Employee[]
+
+  @@map("shifts")
+}
+
+/// legacy: system.WeeklyOffConfig — weekly-off pattern per site/year.
+/// NEW: `daysOfWeek Int[]` replaces legacy CSV/flag storage; convention
+/// documented here: 1=Sunday ... 7=Saturday (ISO-8601). App validates
+/// 1..7 at write time (legacy accepted free-form values).
+model WeeklyOffConfig {
+  id         Int     @id @default(autoincrement())
+  name       String
+  siteId     Int?
+  /// NEW: see docblock — replaces legacy CSV storage (BR-MD-18).
+  daysOfWeek Int[]
+  year       Int
+  isActive   Boolean @default(true)
+
+  site        Site?                 @relation(fields: [siteId], references: [id])
+  assignments WeeklyOffAssignment[]
+
+  @@unique([siteId, year, name])
+  @@map("weekly_off_configs")
+}
+
+/// legacy: system.WeeklyOffList — stored WOFListId/WOFId/Year/PrevYear/ProfileId
+/// and a CSV of SiteIds in a varchar(200) column.
+/// NEW shape: one row per (employee, year) pointing at a config — replaces the
+/// CSV column with a real relation (FIX of BR-MD-18). Prev-year carryover is
+/// represented by the previous year's row, not a duplicate copy.
+model WeeklyOffAssignment {
+  id                Int @id @default(autoincrement())
+  profileId         Int
+  weeklyOffConfigId Int
+  year              Int
+
+  profile Profile         @relation(fields: [profileId], references: [id])
+  config  WeeklyOffConfig @relation(fields: [weeklyOffConfigId], references: [id])
+
+  @@unique([profileId, year])
+  @@map("weekly_off_assignments")
+}
+
+/// legacy: master.HolidayList (9 rows — named holiday calendars per site)
+model HolidayList {
+  id       Int     @id @default(autoincrement())
+  name     String
+  siteId   Int?
+  isActive Boolean @default(true)
+
+  entries HolidayCalendarEntry[]
+  site    Site?                  @relation(fields: [siteId], references: [id])
+
+  @@map("holiday_lists")
+}
+
+/// legacy: HolidayCalendar — per-profile assigned holidays with
+/// PrevHolidayDate carryover semantics (BR-MD-12).
+model HolidayCalendarEntry {
+  id              Int       @id @default(autoincrement())
+  holidayListId   Int
+  profileId       Int
+  date            DateTime  @db.Date
+  /// legacy: PrevHolidayDate — used when a holiday shifts across the
+  /// employment year boundary; kept because leave calculations depend on it.
+  prevHolidayDate DateTime? @db.Date
+
+  holidayList HolidayList @relation(fields: [holidayListId], references: [id])
+  profile     Profile     @relation(fields: [profileId], references: [id])
+
+  @@unique([profileId, holidayListId, date])
+  @@map("holiday_calendar_entries")
+}
+
+/// legacy: system.MetaData (42 rows) — logical form entities
+/// (1=Language, 2=Role, 3=Site, 4=Department, 5=Basic Profile, 6=Work Employee,
+/// 7=Bank, 8=Document, ...).
+/// NEW (DECISION D-003): this is the SAFE re-modeling of the legacy metadata
+/// engine. Legacy used these rows to build dynamic SQL by string concatenation
+/// (SEC-L-03). Here they only DRIVE THE UI (form sections, fields, validation)
+/// and never generate SQL — every master is a typed table (Department, Site,
+/// ... above). `tableName`/`primaryKeyColumn` are kept as reference metadata
+/// pointing at typed models, never interpolated into queries.
+model FormEntity {
+  /// legacy MetaDataId preserved (1..42); sequence continues for new entities.
+  id               Int     @id @default(autoincrement())
+  name             String
+  /// NEW: stable slug (e.g. "department", "document") used by APIs instead of ids.
+  key              String  @unique
+  /// legacy: table name + pk column (documentation only — see docblock).
+  legacyTableName  String?
+  legacyPrimaryKey String?
+  displayOrder     Int     @default(0)
+  isActive         Boolean @default(true)
+
+  fields FormField[]
+
+  @@map("form_entities")
+}
+
+/// legacy: system.MetaDataDetail (241 rows) — field definitions.
+/// legacy DataType catalog is FK'd to Parameter ParameterTypeId=6:
+///   14=string, 15=password, 16=bit, 17=date, 19=byte, 20=int, 23=upload,
+///   26=singleselect, 30=multiselect, 31=Text (BR-MD-16).
+/// NEW (D-003): `config Json` absorbs the legacy free-form columns
+/// (DropDownList sources, OnParentSelect cascades, ValidationText regex,
+/// grid visibility, sectioning) in ONE typed place instead of 10 sparse
+/// boolean/bit columns; `validationRegex` promoted out of config because it
+/// is enforced server-side here (legacy enforced only client-side, BR-MD-03).
+model FormField {
+  /// legacy MetaDataDetailId preserved where possible; explicit seed IDs keep
+  /// DocumentFieldValue.fieldId compatible with the legacy metadata extracts.
+  id              Int     @id @default(autoincrement())
+  entityId        Int
+  fieldName       String
+  displayName     String
+  dataTypeId      Int
+  isMandatory     Boolean @default(false)
+  /// NEW: enforced server-side on writes (legacy: client-only).
+  validationRegex String?
+  isForeignKey    Boolean @default(false)
+  /// For FK fields: which entity/catalog the dropdown reads from.
+  foreignEntityId Int?
+  displayOrder    Int     @default(0)
+  isGridVisible   Boolean @default(true)
+  /// legacy: DocumentType — marks document-type-specific fields (e.g.
+  /// ExpiryDate variants per document type).
+  documentTypeId  Int?
+  /// NEW: absorbs legacy sparse columns (dropdown config, cascades, width...).
+  config          Json?
+
+  entity              FormEntity           @relation(fields: [entityId], references: [id])
+  documentType        DocumentType?        @relation(fields: [documentTypeId], references: [id])
+  documentFieldValues DocumentFieldValue[]
+
+  /// Document MetaDataId has multiple `ExpiryDate` definitions, one per
+  /// DocumentType; fieldName alone must therefore not be unique.
+  @@unique([entityId, fieldName, documentTypeId])
+  @@index([entityId])
+  @@map("form_fields")
+}
+
+/// legacy: usr.Employee (PK EmployeeId; ProfileId FK).
+model Employee {
+  id                     Int       @id @default(autoincrement())
+  profileId              Int       @unique
+  /// FIX (D-016): unique — legacy had NO DB unique constraint (only a proc
+  /// check emitting MsgId 7). Length parity: legacy nvarchar(20).
+  employeeCode           String    @unique
+  /// legacy: ReportingTo — self-relation (manager).
+  reportingToId          Int?
+  sourceOfHireId         Int?
+  locationId             Int?
+  siteId                 Int?
+  employeeStatusId       Int?
+  employeeTypeId         Int?
+  contractTypeId         Int?
+  workPhone              String?
+  extension              String?
+  workEmail              String?
+  dateOfJoining          DateTime  @db.Timestamptz(3)
+  dateOfConfirmation     DateTime? @db.Timestamptz(3)
+  /// FIX (D-015): legacy PersonIDNumber was plaintext. Target stores the
+  /// encrypted value and keyed lookup hash separately; API validation still
+  /// enforces the legacy minimum length of 14 characters (BR-MD-07).
+  personIdNumberEnc      String?
+  personIdNumberHash     String?
+  designation            String?
+  shiftId                Int?
+  exitUploadId           Int?
+  // ---- OUT-OF-SCOPE columns kept for parity (payroll/attendance domain) ----
+  isWPSProcessing        Boolean?
+  isSalaryProcessing     Boolean?
+  isAttendanceProcessing Boolean?
+  companyMobileNo        String?
+  companyLandNo          String?
+  payrollSiteId          Int?
+  isAllowedAdvanceLeave  Boolean?
+
+  profile     Profile    @relation(fields: [profileId], references: [id])
+  reportingTo Employee?  @relation("ReportingTree", fields: [reportingToId], references: [id])
+  reports     Employee[] @relation("ReportingTree")
+  site        Site?      @relation(fields: [siteId], references: [id])
+  shift       Shift?     @relation(fields: [shiftId], references: [id])
+
+  @@index([siteId])
+  @@index([reportingToId])
+  @@index([personIdNumberHash])
+  @@map("employees")
+}
+
+/// legacy: usr.ProfileDepartment — M2M junction.
+/// FIX (BR-MD-17): legacy's AddUpdateProfile treated the department list as a
+/// SINGLE value even though the table is M2M. Target writes one row per
+/// department properly; the legacy single-value quirk is NOT reproduced.
+model ProfileDepartment {
+  profileId    Int
+  departmentId Int
+
+  profile    Profile    @relation(fields: [profileId], references: [id])
+  department Department @relation(fields: [departmentId], references: [id])
+
+  @@id([profileId, departmentId])
+  @@map("profile_departments")
+}
+
+/// legacy: usr.Dependant — dependant documents live on the dependant's OWN
+/// Profile row (legacy created real Profile rows for dependants).
+model Dependant {
+  id                 Int  @id @default(autoincrement())
+  /// legacy: DependantProfileId — the dependant's own Profile row.
+  dependantProfileId Int
+  employeeProfileId  Int
+  relationTypeId     Int?
+
+  dependantProfile Profile @relation("DependantProfile", fields: [dependantProfileId], references: [id])
+  employeeProfile  Profile @relation("EmployeeProfile", fields: [employeeProfileId], references: [id])
+
+  @@unique([dependantProfileId, employeeProfileId])
+  @@map("dependants")
+}
+
+/// legacy: usr.Account (bank details, MetaDataId 7 "Bank")
+model BankAccount {
+  id            Int     @id @default(autoincrement())
+  profileId     Int     @unique
+  /// Field names to be confirmed against a live SELECT of usr.Account during
+  /// migration ETL build (bank name, IBAN/account no, currency).
+  accountName   String?
+  /// NEW (D-015): bank account numbers are treated as financial PII; store
+  /// ciphertext + keyed lookup hash, never plaintext.
+  accountNoEnc  String?
+  accountNoHash String?
+  bankName      String?
+  isActive      Boolean @default(true)
+
+  profile Profile @relation(fields: [profileId], references: [id])
+
+  @@index([accountNoHash])
+  @@map("bank_accounts")
+}
+
+// ============================================================================
+// MODULE 3 — DOCUMENT MANAGEMENT
+// ============================================================================
+
+/// legacy: master.DocumentType (11 rows, UQ DocumentName):
+/// 1=Passport, 2=Work Permit, 3=Emirates Id, 4=Health Insurance,
+/// 5=Trade License, 6=Driving License, 106=nol, 107=Visa,
+/// 108=Trafffic Fine (sic), 109=Warning Letter, 110=Accident Document.
+/// IDs preserved (document expiry values are keyed by (documentType, field)).
+model DocumentType {
+  /// legacy DocumentTypeId preserved (1..6, 106..110); sequence continues.
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  isActive Boolean @default(true)
+
+  documents   Document[]
+  formFields  FormField[]
+  storedFiles StoredFile[]
+
+  @@map("document_types")
+}
+
+/// legacy: HRMS.Document (3,279 rows / 3,126 active).
+/// FIX (DATABASE_DISCOVERY §4): legacy `ExpiryDate` was a DEAD column (100%
+/// NULL) — real expiry hid in AdditinalDocumentValue strings. Here expiry is
+/// a first-class DATE column, populated by ETL from those strings and
+/// maintained by the app from then on. Reporting/scheduler queries become
+/// simple indexed reads instead of string parsing.
+model Document {
+  /// legacy: bigint identity — preserved (BigInt here).
+  id             BigInt    @id @default(autoincrement())
+  documentTypeId Int
+  profileId      Int
+  issueDate      DateTime? @db.Date
+  /// NEW: first-class expiry (see docblock). Null = document has no expiry
+  /// (e.g. some Health Insurance rows).
+  expiryDate     DateTime? @db.Date
+  /// FIX (D-015): legacy IdentityNo was free-text and may contain passport/
+  /// Emirates-ID values. Encrypt at rest; use a keyed hash for equality search.
+  identityNoEnc  String?
+  identityNoHash String?
+  documentTitle  String?
+  remarks        String?   @db.Text
+  isActive       Boolean   @default(true)
+  /// legacy: IsSelf — self-service documents vs. company-held copies;
+  /// report views filter on it (BR-DOC-18) — kept.
+  isSelf         Boolean   @default(true)
+  companyId      Int?
+  createdAt      DateTime  @default(now()) @db.Timestamptz(3)
+  createdById    Int?
+  updatedAt      DateTime  @updatedAt @db.Timestamptz(3)
+
+  documentType DocumentType         @relation(fields: [documentTypeId], references: [id])
+  profile      Profile              @relation(fields: [profileId], references: [id])
+  fieldValues  DocumentFieldValue[]
+  files        DocumentFile[]
+  expiryAlerts ExpiryAlertLog[]
+
+  @@index([profileId, isActive])
+  @@index([documentTypeId])
+  @@index([identityNoHash])
+  /// NEW: powers the expiry scheduler scans that legacy did with string
+  /// conversion over AdditinalDocumentValue (BR-DOC-17).
+  @@index([expiryDate, isActive])
+  @@map("documents")
+}
+
+/// legacy: master.AdditinalDocumentValue (4,417 rows) — per-document extra
+/// field values, keyed by MetaDataDetailId, ALL values as varchar(5000)
+/// strings (dates stored as dd/mm/yyyy strings — the source of the mixed-
+/// format bug, BR-DOC-15).
+/// NEW shape: expiry (DataTypeId 17) is PROMOTED to Document.expiryDate; this
+/// table keeps only the remaining extra fields. `valueEnc` applies D-015 if a
+/// future extra field is classified PII; plain `value` otherwise.
+model DocumentFieldValue {
+  id         BigInt  @id @default(autoincrement())
+  documentId BigInt
+  /// legacy: MetaDataDetailId -> system.MetaDataDetail (28=Passport expiry,
+  /// 1149/1150/1153/1154/1151 = other expiry fields, ...).
+  fieldId    Int
+  value      String?
+  /// NEW: for sensitive extra fields only (D-015); null for normal values.
+  valueEnc   String?
+
+  document Document  @relation(fields: [documentId], references: [id])
+  field    FormField @relation(fields: [fieldId], references: [id])
+
+  @@unique([documentId, fieldId])
+  @@map("document_field_values")
+}
+
+/// legacy: master.FileDoc (11,063 rows) — physical file records.
+/// NEW (D-008): `storageKey` points into PRIVATE storage (folder outside web
+/// root / object storage). Legacy stored a flat `FolderPath` under the API
+/// root served UNAUTHENTICATED at /Documents (SEC-L-04) — that pattern is
+/// abolished; every byte is streamed through an authorized endpoint.
+/// `fileTypeId` (legacy FileDocTypeId -> DocumentType FK — legacy naming
+/// confusion) is kept because the legacy column is real, but the D-016 ETL
+/// re-derives it from the document mapping instead of trusting the hardcoded
+/// "1" the legacy insert proc wrote.
+model StoredFile {
+  id               BigInt   @id @default(autoincrement())
+  /// legacy: DocName (original display name)
+  originalName     String
+  /// legacy: FolderPath — retained only for migration reconciliation; target
+  /// downloads use storageKey and never expose this path publicly.
+  legacyFolderPath String?
+  /// NEW: private-storage key (UUID-based; original name kept only here).
+  storageKey       String   @unique
+  /// NEW: enables correct content-disposition/preview handling.
+  mimeType         String?
+  /// NEW: integrity check + change detection.
+  sizeBytes        BigInt?
+  sha256           String?
+  fileTypeId       Int?
+  createdById      Int?
+  createdAt        DateTime @default(now()) @db.Timestamptz(3)
+  isActive         Boolean  @default(true)
+
+  fileType     DocumentType?  @relation(fields: [fileTypeId], references: [id])
+  createdBy    Profile?       @relation("UploadedFiles", fields: [createdById], references: [id])
+  profilePhoto Profile[]      @relation("ProfilePhoto")
+  documents    DocumentFile[]
+
+  @@index([fileTypeId])
+  @@map("stored_files")
+}
+
+/// legacy: master.FileDocMapping (3,269 rows) — links FileDoc rows to
+/// Document rows (and to extra-column upload fields via MetaDataDetailId).
+/// Legacy linkage was delete-then-reinsert on replace (BR-DOC-06); target
+/// keeps an explicit many-to-many with `isCurrent` so file history is
+/// auditable instead of being silently replaced.
+/// NOTE: legacy also mapped files to NON-document owners (profiles etc.)
+/// through other field ids; phase-1 models only the Document linkage —
+/// extend with a polymorphic owner if phase-2 modules need more.
+model DocumentFile {
+  id           BigInt   @id @default(autoincrement())
+  documentId   BigInt
+  fileId       BigInt
+  /// legacy: MetaDataDetailId when the file belongs to an extra upload field.
+  fieldId      Int?
+  /// NEW: replaces delete-then-insert history loss (see docblock).
+  isCurrent    Boolean  @default(true)
+  uploadedById Int?
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+
+  document Document   @relation(fields: [documentId], references: [id])
+  file     StoredFile @relation(fields: [fileId], references: [id])
+
+  @@unique([documentId, fileId, fieldId])
+  @@index([fileId])
+  @@map("document_files")
+}
+
+/// NEW — output record of the document-expiry scheduler (D-009).
+/// Legacy compiled Excel sheets and mailed them to HR with NO record of what
+/// was sent; dedup between runs was impossible. Each alert window per document
+/// per run is logged here so runs are idempotent (unique constraint) and
+/// auditable. Windows (BR-DOC-17): expired(prev-month..yesterday) / 7d / 1m / 3m.
+model ExpiryAlertLog {
+  id          BigInt   @id @default(autoincrement())
+  documentId  BigInt
+  /// "expired" | "7d" | "1m" | "3m"
+  alertWindow String
+  sentAt      DateTime @default(now()) @db.Timestamptz(3)
+  recipients  String
+  runId       String
+
+  document Document @relation(fields: [documentId], references: [id])
+
+  @@unique([documentId, alertWindow, runId])
+  @@map("expiry_alert_logs")
+}

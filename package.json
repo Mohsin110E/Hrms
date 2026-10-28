@@ -1,0 +1,14 @@
+{
+  "name": "swan-hrms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HRMS modernization — NestJS + Prisma + PostgreSQL (phase-2 scaffold; legacy repo remains a read-only reference)",
+  "scripts": {
+    "prisma:format": "prisma format",
+    "prisma:validate": "prisma validate"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "prisma": "^4.16.2"
+  }
+}
