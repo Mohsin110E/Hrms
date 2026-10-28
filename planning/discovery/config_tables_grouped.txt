@@ -1,0 +1,441 @@
+
+##### CONFIG #####
+CONFIG|1|CompOff Leave Expiry|90|NULL
+CONFIG|2|CompOff Request Expiry|30|NULL
+CONFIG|3|AnnualLeave Exception Months|0|0
+CONFIG|4|CompOffAvail Exception days|5,6,7|NULL
+CONFIG|5|WeekOffdays for Operation|1|NULL
+CONFIG|6|HalfDay Min work hours|0|NULL
+CONFIG|7|Full Day Min work hours |8|NULL
+CONFIG|8|Break Time In Min-Upload|30|NULL
+CONFIG|9|Break Time In Min-ERP|30|NULL
+CONFIG|10|Attendance Sync Date|1|NULL
+CONFIG|11|PayrollMonth|6|NULL
+CONFIG|12|IsHrAdminAvailable|1|NULL
+CONFIG|13|PayrollPassword|REDACTED-ROTATE-AT-CUTOVER|NULL
+CONFIG|14|OTRequired|1|NULL
+CONFIG|15|LeaveEncashment|1|NULL
+CONFIG|16|GratuityDate|2000-01-01|NULL
+CONFIG|17|CompOffAvail Exception days Site1|5,6|NULL
+CONFIG|18|CompOffAvail Exception days Site2|6,7|NULL
+CONFIG|19|Family Airfare required|1|NULL
+CONFIG|20|MaxNoOfFamilyMembers|4|NULL
+CONFIG|21|Deduction Perccentage|20|NULL
+CONFIG|22|Full day work minutes|480|NULL
+CONFIG|23|Minimum days to apply sandwitch rule|2|NULL
+CONFIG|24|RamadanDates|2026-02-18|2026-03-19
+CONFIG|25|Annual Leave Validation|0|NULL
+
+##### MENUITEM #####
+MENUITEM|1|Employee List|37|3|fa fa-users|1|/profilelist|1|Employee Master|1
+MENUITEM|2|Master Setup|NULL|6|fa fa-cogs|1|/mastersetup|2|Master Setup|1
+MENUITEM|3|Language|2|1|NULL|1|NULL|3|Language|0
+MENUITEM|4|Role|2|2|NULL|0|NULL|4|Role|0
+MENUITEM|6|Department|2|3|NULL|1|NULL|6|Department|0
+MENUITEM|7|Site|2|4|NULL|1|NULL|7|Site|0
+MENUITEM|8|Meta Data|2|5|NULL|1|NULL|8|Meta Data|0
+MENUITEM|9|Meta Data Detail|2|6|NULL|1|NULL|9|Meta Data Detail|0
+MENUITEM|10|Meta Data config|2|7|NULL|1|NULL|10|Meta Data Config|0
+MENUITEM|11|Parameter|2|8|NULL|1|NULL|11|Parameter|0
+MENUITEM|12|Document List|37|4|fa fa-folder-open-o|1|/documentlist|12|Document List|1
+MENUITEM|13|Role Leave Entitlement|2|9|NULL|0|NULL|13|Role Leave Entitlement|0
+MENUITEM|14|Holiday & Weekly Off|NULL|3|fa fa-cogs|0|/holidayconfig|14|Holiday & Weekly Off|0
+MENUITEM|15|Comp Off|36|6|fa fa-calendar|1|/compoff|15|My Comp Off|1
+MENUITEM|16|Leave|36|1|fa fa-user-times|0|/leave|16|Leave|1
+MENUITEM|17|Leave Chart|36|5|fa fa-line-chart|0|/leavechart|17|Leave Chart|1
+MENUITEM|18|Leave Calender|36|6|fa fa-calendar|0|/leavecalender|18|Leave Calender|1
+MENUITEM|19|Month Chart|36|4|fa fa-line-chart|0|/monthchart|19|Month Chart|1
+MENUITEM|20|Leave Summary|36|5|fa fa-list-alt|1|/leavesummary|20|Leave Summary|1
+MENUITEM|21|Document Type|2|10|NULL|1|NULL|21|Document Type|0
+MENUITEM|22|Menu Item|2|11|NULL|1|NULL|22|Menu Item|0
+MENUITEM|23|Menu User Type|2|12|NULL|1|NULL|23|Menu User Type|0
+MENUITEM|24|Payroll Type|2|13|NULL|1|NULL|24|Payroll Type|0
+MENUITEM|25|Payroll Header|2|14|NULL|1|NULL|25|Payroll Header|0
+MENUITEM|27|Generate SIF|39|3|fa fa-file-text|1|/profilecif|27|Generate CIF|0
+MENUITEM|28|Payroll View|39|5|fa fa-file-text|1|/profilepayroll|28|Payroll View|1
+MENUITEM|30|Reports|NULL|4|fa fa-bar-chart|1|/reports|30|Reports|1
+MENUITEM|31|Document Report|30|2|NULL|1|NULL|31|Document Report|0
+MENUITEM|32|Leave Request|30|5|NULL|1|NULL|32|Leave Request|0
+MENUITEM|36|Leave|NULL|2|fa fa-bed|1|NULL|33|Leave|1
+MENUITEM|37|Profile|NULL|1|fa fa-book|1|NULL|34|Profile|1
+MENUITEM|39|Payroll|NULL|3|fa fa-university|1|NULL|35|Payroll|1
+MENUITEM|40|Attendance Sync|39|1|fa fa-refresh|1|/leavesync|36|Attendance  Sync|0
+MENUITEM|140|OT Config|2|15|NULL|1|NULL|37|OT Config|0
+MENUITEM|141|Department OverTime|2|16|NULL|1|NULL|38|Department OverTimeT|0
+MENUITEM|143|Holiday List|2|17|NULL|1|NULL|39|Holiday List|0
+MENUITEM|144|Holiday Site Mapping|2|18|NULL|1|NULL|40|Holiday Site Mapping|0
+MENUITEM|145|Configure Weekly Off|2|19|NULL|1|NULL|41|Configure Weekly Off|0
+MENUITEM|146|Profile|155|1|NULL|1|NULL|42|Profile|0
+MENUITEM|147|Document|155|2|NULL|0|NULL|43|Document|0
+MENUITEM|148|Archive|155|3|NULL|0|NULL|44|Archive|0
+MENUITEM|149|Basic & Work Details|146|1|fa fa-pencil|1|NULL|45|Basic & Work Details|0
+MENUITEM|150|Advanced|146|2|fa fa-folder|1|NULL|46|Advanced|0
+MENUITEM|151|Dependants|146|3|fa fa-users|1|NULL|47|Dependants|0
+MENUITEM|153|Employee Payroll|39|6|fa fa-money|1|/userprofile|48|Employee Payroll|1
+MENUITEM|154|OverTime|146|5|fa fa-users|1|NULL|49|OverTime|0
+MENUITEM|155|Profile|NULL|1|NULL|1|NULL|50|Profile|0
+MENUITEM|156|My Profile|37|1|fa fa-user-secret|1|/myprofile|51|My Profile|1
+MENUITEM|157|Upload|39|5|fa fa-user|1|/upload|52|Upload|0
+MENUITEM|158|Attendance|157|1|NULL|1|NULL|53|Attendance|0
+MENUITEM|159|Attendance Process|39|2|fa fa-user|1|/attendanceProcess|54|Attendance Process|0
+MENUITEM|160|Document|146|6|fa fa-file|1|NULL|55|Documents|0
+MENUITEM|161|User Credentials|146|7|fa fa-users|1|NULL|56|User Credentials|0
+MENUITEM|162|Site User|37|7|fa fa-unlock|1|/siteuser|83|Site User|1
+MENUITEM|163|My Documents|37|2|fa fa-file-text|1|/mydocuments|57|My Documents|1
+MENUITEM|165|Dashborad|39|1|fa fa-cubes|1|/dashboard|60|Payroll Processing|1
+MENUITEM|166|Shift Master|2|20|NULL|1|NULL|58|Shift Master|0
+MENUITEM|167|Renewal Report|30|21|NULL|0|/renewal|59|Renewal Report|0
+MENUITEM|168|My Leave Request|36|4|fa fa-umbrella|1|/myleave|61|My Leave Request|1
+MENUITEM|169|Team Request|36|6|fa fa-sitemap|1|/teamrequest|62|Team Request|1
+MENUITEM|170|Team Calendar|36|7|fa fa-calendar-check-o|1|/teamcalender|63|Team Calendar|1
+MENUITEM|171|Payroll Batch|2|10|NULL|1|NULL|64|Payroll Batch|0
+MENUITEM|172|OT Payslip|39|9|fa fa-file-text|1|/otpayslip|65|OT Payslip|1
+MENUITEM|173|Final Settlement|39|7|fa fa-hourglass-end|1|/finalsettlementlist|66|Final Settlement|1
+MENUITEM|174|Final Settlement Form|39|10|NULL|1|/finalsettlement|67|Final Settlement|0
+MENUITEM|175|Gratuity|39|8|fa fa-usd|1|/gratuitylist|68|Gratuity|1
+MENUITEM|177|Team Comp Off Request|36|7|fa fa-exchange|1|/teamcompoffreq|69|Team Combo Off Request|1
+MENUITEM|178|Expired Document Report|30|3|NULL|1|NULL|70|Expired Document|0
+MENUITEM|179|Expiring Document Report|30|4|NULL|1|NULL|71|Expiring Document|0
+MENUITEM|180|Employee Profile Report|30|1|NULL|1|NULL|72|Employee Profile|0
+MENUITEM|182|Leave Summary|30|4|NULL|1|NULL|79|Leave Summary|0
+MENUITEM|183|Leave Record Report|30|5|NULL|1|NULL|80|Leave Record|0
+MENUITEM|184|Airfare|146|7|fa fa-users|1|NULL|73|Airfare|0
+MENUITEM|185|Organization Airfare|2|21|NULL|1|NULL|74|Organization Airfare|0
+MENUITEM|186|Air Ticket Request|NULL|8|fa fa-plane|1|NULL|75|Air Ticket Request|1
+MENUITEM|187|Master Setup|2|1|NULL|1|/mastersetup|76|Master Setup|1
+MENUITEM|191|Deduction Type|2|20|NULL|1|NULL|81|Deduction Type|0
+MENUITEM|192|Deduction|39|8|NULL|1|/deductionlist|84|Deduction|1
+MENUITEM|193|Gratuity Report|30|5|NULL|1|NULL|85|Gratuity Report|0
+MENUITEM|194|Payroll Report|195|6|NULL|1|NULL|86|Payroll Report|0
+MENUITEM|195|Payroll Report|39|10|NULL|1|/payroll-report|87|Report|1
+MENUITEM|196|Holiday Site Mapping|146|9|fa fa-users|1|NULL|89|Holiday Site Mapping|0
+MENUITEM|197|Configure Weekly off|146|10|fa fa-users|1|NULL|88|Configure Weekly off|0
+MENUITEM|198|Lulu Template|195|2|NULL|1|NULL|90|Lulu Template|0
+MENUITEM|199|Deduction Upload|157|2|NULL|1|NULL|91|Deduction|0
+MENUITEM|200|Increment Report|195|3|NULL|1|NULL|96|Employee Payroll|0
+MENUITEM|201|Attendance|NULL|2|fa fa-calendar|1|NULL|92|Attendance|1
+MENUITEM|202|Attendance Marking|201|1|fa fa-list|1|/musterlist|93|Attendance Marking|1
+MENUITEM|203|Group Attendance|201|2|fa fa-check-square-o|1|/groupmuster|94|Group Attendance|1
+MENUITEM|204|In/Out|201|0|fa fa-exchange|1|/muster|95|In/Out|1
+MENUITEM|205|Attendance Lock|39|1|fa fa-university|1|/attendance-lock|96|Attendance Lock|1
+MENUITEM|206|WPS Processing|39|2|fa fa-money|1|/payroll-wps|97|WPS Processing|1
+MENUITEM|207|OT Processing|39|3|fa fa-file-text|1|/payroll-ot|98|OT Processing|1
+MENUITEM|208|WPS Payslip View|39|4||1|/wps-view|99|WPS Payslip View|1
+MENUITEM|209|OT Payslip View|39|5||1|/ot-view|100|OT Payslip View|1
+MENUITEM|210|Ot Process|39|1|NULL|1|/otprocess|101|NULL|1
+MENUITEM|211|Advance Leave Process|39|3|NULL|1|/advanceleaveprocess|102|NULL|1
+MENUITEM|212|Attedance Process Individual|39|7|NULL|1|/attedanceprocessindividual|103|NULL|1
+MENUITEM|213|Salary Process|39|9|NULL|1|/salaryProcess|104|NULL|1
+
+##### MENUUSERTYPE #####
+MENUUSERTYPE|1126|37|1|NULL
+MENUUSERTYPE|1275|161|1|NULL
+MENUUSERTYPE|1276|146|1|NULL
+MENUUSERTYPE|1278|155|1|NULL
+MENUUSERTYPE|1279|149|1|NULL
+MENUUSERTYPE|1280|150|1|NULL
+MENUUSERTYPE|1282|154|1|NULL
+MENUUSERTYPE|1283|160|1|NULL
+MENUUSERTYPE|1284|151|1|NULL
+MENUUSERTYPE|1285|163|1|NULL
+MENUUSERTYPE|1286|156|1|NULL
+MENUUSERTYPE|1383|36|1|NULL
+MENUUSERTYPE|1384|168|1|NULL
+MENUUSERTYPE|1398|15|1|NULL
+MENUUSERTYPE|1400|201|1|NULL
+MENUUSERTYPE|1401|204|1|NULL
+MENUUSERTYPE|1402|202|1|NULL
+MENUUSERTYPE|1131|37|2|NULL
+MENUUSERTYPE|1141|161|2|NULL
+MENUUSERTYPE|1143|1|2|NULL
+MENUUSERTYPE|1266|146|2|NULL
+MENUUSERTYPE|1267|155|2|NULL
+MENUUSERTYPE|1268|149|2|NULL
+MENUUSERTYPE|1269|150|2|NULL
+MENUUSERTYPE|1270|154|2|NULL
+MENUUSERTYPE|1271|160|2|NULL
+MENUUSERTYPE|1272|151|2|NULL
+MENUUSERTYPE|1287|163|2|NULL
+MENUUSERTYPE|1288|156|2|NULL
+MENUUSERTYPE|1289|12|2|NULL
+MENUUSERTYPE|1365|169|2|NULL
+MENUUSERTYPE|1366|170|2|NULL
+MENUUSERTYPE|1367|36|2|NULL
+MENUUSERTYPE|1368|168|2|NULL
+MENUUSERTYPE|1403|201|2|NULL
+MENUUSERTYPE|1404|204|2|NULL
+MENUUSERTYPE|1405|202|2|NULL
+MENUUSERTYPE|1406|203|2|NULL
+MENUUSERTYPE|1425|177|2|NULL
+MENUUSERTYPE|75|37|3|NULL
+MENUUSERTYPE|1089|12|3|NULL
+MENUUSERTYPE|1098|1|3|NULL
+MENUUSERTYPE|1108|146|3|NULL
+MENUUSERTYPE|1109|149|3|NULL
+MENUUSERTYPE|1110|150|3|NULL
+MENUUSERTYPE|1114|154|3|NULL
+MENUUSERTYPE|1115|151|3|NULL
+MENUUSERTYPE|1128|155|3|NULL
+MENUUSERTYPE|1138|160|3|NULL
+MENUUSERTYPE|1139|161|3|NULL
+MENUUSERTYPE|1290|172|3|NULL
+MENUUSERTYPE|1291|158|3|NULL
+MENUUSERTYPE|1292|159|3|NULL
+MENUUSERTYPE|1293|40|3|NULL
+MENUUSERTYPE|1294|145|3|NULL
+MENUUSERTYPE|1295|165|3|NULL
+MENUUSERTYPE|1296|6|3|NULL
+MENUUSERTYPE|1297|141|3|NULL
+MENUUSERTYPE|1298|31|3|NULL
+MENUUSERTYPE|1299|21|3|NULL
+MENUUSERTYPE|1300|180|3|NULL
+MENUUSERTYPE|1301|178|3|NULL
+MENUUSERTYPE|1302|179|3|NULL
+MENUUSERTYPE|1303|173|3|NULL
+MENUUSERTYPE|1304|174|3|NULL
+MENUUSERTYPE|1305|27|3|NULL
+MENUUSERTYPE|1306|175|3|NULL
+MENUUSERTYPE|1307|143|3|NULL
+MENUUSERTYPE|1308|144|3|NULL
+MENUUSERTYPE|1309|3|3|NULL
+MENUUSERTYPE|1310|36|3|NULL
+MENUUSERTYPE|1312|20|3|NULL
+MENUUSERTYPE|1313|2|3|NULL
+MENUUSERTYPE|1314|22|3|NULL
+MENUUSERTYPE|1315|23|3|NULL
+MENUUSERTYPE|1316|8|3|NULL
+MENUUSERTYPE|1317|10|3|NULL
+MENUUSERTYPE|1318|9|3|NULL
+MENUUSERTYPE|1319|163|3|NULL
+MENUUSERTYPE|1321|156|3|NULL
+MENUUSERTYPE|1322|140|3|NULL
+MENUUSERTYPE|1323|11|3|NULL
+MENUUSERTYPE|1324|39|3|NULL
+MENUUSERTYPE|1325|153|3|NULL
+MENUUSERTYPE|1326|171|3|NULL
+MENUUSERTYPE|1327|25|3|NULL
+MENUUSERTYPE|1328|24|3|NULL
+MENUUSERTYPE|1329|28|3|NULL
+MENUUSERTYPE|1331|30|3|NULL
+MENUUSERTYPE|1332|166|3|NULL
+MENUUSERTYPE|1333|7|3|NULL
+MENUUSERTYPE|1334|162|3|NULL
+MENUUSERTYPE|1335|170|3|NULL
+MENUUSERTYPE|1336|177|3|NULL
+MENUUSERTYPE|1337|169|3|NULL
+MENUUSERTYPE|1338|157|3|NULL
+MENUUSERTYPE|1407|201|3|NULL
+MENUUSERTYPE|1408|204|3|NULL
+MENUUSERTYPE|1409|202|3|NULL
+MENUUSERTYPE|1410|203|3|NULL
+MENUUSERTYPE|1423|208|3|NULL
+MENUUSERTYPE|1424|209|3|NULL
+MENUUSERTYPE|19|1|4|NULL
+MENUUSERTYPE|29|12|4|NULL
+MENUUSERTYPE|73|37|4|NULL
+MENUUSERTYPE|1116|146|4|NULL
+MENUUSERTYPE|1117|149|4|NULL
+MENUUSERTYPE|1118|150|4|NULL
+MENUUSERTYPE|1123|151|4|NULL
+MENUUSERTYPE|1124|155|4|NULL
+MENUUSERTYPE|1147|160|4|NULL
+MENUUSERTYPE|1148|161|4|NULL
+MENUUSERTYPE|1149|162|4|NULL
+MENUUSERTYPE|1207|154|4|NULL
+MENUUSERTYPE|1339|163|4|NULL
+MENUUSERTYPE|1340|156|4|NULL
+MENUUSERTYPE|1342|169|4|NULL
+MENUUSERTYPE|1345|144|4|NULL
+MENUUSERTYPE|1349|30|4|NULL
+MENUUSERTYPE|1350|170|4|NULL
+MENUUSERTYPE|1354|36|4|NULL
+MENUUSERTYPE|1356|168|4|NULL
+MENUUSERTYPE|1357|145|4|NULL
+MENUUSERTYPE|1358|2|4|NULL
+MENUUSERTYPE|1360|31|4|NULL
+MENUUSERTYPE|1361|143|4|NULL
+MENUUSERTYPE|1362|166|4|NULL
+MENUUSERTYPE|1363|20|4|NULL
+MENUUSERTYPE|1364|180|4|NULL
+MENUUSERTYPE|1369|184|4|NULL
+MENUUSERTYPE|1374|173|4|NULL
+MENUUSERTYPE|1375|153|4|NULL
+MENUUSERTYPE|1377|39|4|NULL
+MENUUSERTYPE|1381|174|4|NULL
+MENUUSERTYPE|1382|157|4|NULL
+MENUUSERTYPE|1385|191|4|NULL
+MENUUSERTYPE|1386|192|4|NULL
+MENUUSERTYPE|1387|193|4|NULL
+MENUUSERTYPE|1388|182|4|NULL
+MENUUSERTYPE|1389|183|4|NULL
+MENUUSERTYPE|1391|195|4|NULL
+MENUUSERTYPE|1392|32|4|NULL
+MENUUSERTYPE|1393|196|4|NULL
+MENUUSERTYPE|1394|197|4|NULL
+MENUUSERTYPE|1396|199|4|NULL
+MENUUSERTYPE|1397|177|4|NULL
+MENUUSERTYPE|1399|200|4|NULL
+MENUUSERTYPE|1411|201|4|NULL
+MENUUSERTYPE|1412|204|4|NULL
+MENUUSERTYPE|1413|202|4|NULL
+MENUUSERTYPE|1414|203|4|NULL
+MENUUSERTYPE|1417|207|4|NULL
+MENUUSERTYPE|1418|206|4|NULL
+MENUUSERTYPE|1419|205|4|NULL
+MENUUSERTYPE|1420|175|4|NULL
+MENUUSERTYPE|1421|208|4|NULL
+MENUUSERTYPE|1422|209|4|NULL
+
+##### MENUDOC #####
+MENUDOC|1|Passport|NULL
+MENUDOC|2|Work Permit|NULL
+MENUDOC|3|Emirates Id|NULL
+MENUDOC|4|Health Insurance|NULL
+MENUDOC|5|Trade License|NULL
+MENUDOC|6|Driving License|NULL
+MENUDOC|106|nol|NULL
+MENUDOC|107|Visa|NULL
+MENUDOC|108|Trafffic Fine|NULL
+MENUDOC|109|Warning Letter|NULL
+MENUDOC|110|Accident Document|NULL
+
+##### SITE #####
+SITE|1|Dubai Head Office|1|126|2020-08-05 00:00:00.000
+SITE|2|Abudhabi|1|126|2020-08-05 00:00:00.000
+SITE|3|Nepal|1|NULL|NULL
+SITE|4|India|1|NULL|NULL
+
+##### DEPT #####
+DEPT|1|Sales|1|1
+DEPT|2|Operations|1|1
+DEPT|3|Stores|1|1
+DEPT|4|Finance|1|1
+DEPT|5|Admin|1|1
+DEPT|6|HR|1|1
+DEPT|7|IT|1|1
+DEPT|8|Safety & Procurement|1|1
+
+##### ROLE #####
+ROLE|1|Admin|0|NULL
+ROLE|5|Manager|1|NULL
+ROLE|6|Employee|0|NULL
+ROLE|7|Admin|1|NULL
+
+##### USERTYPE #####
+USERTYPE|1|Executive |1|1
+USERTYPE|2|Manager|1|2
+USERTYPE|3|System Admin|1|3
+USERTYPE|4|HR Admin|1|4
+
+##### SHIFT #####
+SHIFT|1|Dubai Office shift|08:00:00.000|17:30:00.000|5|60|126|126|2020-07-21 11:24:29.963|2026-06-02 11:45:16.663|NULL|NULL
+SHIFT|2|Dubai operations shift|10:00:00.000|19:00:00.000|5|60|126|126|2020-07-21 13:14:48.100|2025-05-27 11:23:24.470|NULL|NULL
+SHIFT|3|Abudhabi Office Shift|08:00:00.000|17:30:00.000|5|60|126|126|2020-08-04 00:00:00.000|2026-06-02 11:45:31.273|NULL|NULL
+SHIFT|4|Abudhabi Operation Shift|09:00:00.000|18:00:00.000|5|60|126|126|2020-08-04 00:00:00.000|2025-05-27 11:23:50.200|NULL|NULL
+SHIFT|5|Nepal Office Shift|09:45:00.000|19:15:00.000|5|60|757|126|2026-05-22 09:24:12.973|2026-06-02 11:46:26.410|NULL|NULL
+SHIFT|6|India Office Shift|09:30:00.000|19:00:00.000|5|60|757|126|2026-05-22 09:24:32.890|2026-06-02 11:46:03.150|NULL|NULL
+
+##### WOF #####
+WOF|1|AllFri - 2ndLastSat|All Friday and 2nd and Last Saturday|Friday|1,2,3,4,5|Saturday|2,10
+WOF|2|AllFri - 2nd4thSat|All Friday and 2nd and 4th Saturday|Friday|1,2,3,4,5|Saturday|2,4
+WOF|3|AllFri- AllSat|All Friday and All Saturday|Friday|1,2,3,4,5|Saturday|1,2,3,4,5
+WOF|4|AllFri|All Friday|Friday|1,2,3,4,5|NULL|NULL
+WOF|5|AllSun - NoSat|All Sunday|Sunday|1,2,3,4,5|Saturday|0
+WOF|6|AllSun - AllSat|All Sunday and all Saturday|Sunday|1,2,3,4,5|Saturday|1,2,3,4,5
+WOF|7|AllThur|All Thursday|Thursday|1,2,3,4,5|NULL|NULL
+WOF|8|AllTue|All Tuesday|Tuesday|1,2,3,4,5|NULL|NULL
+WOF|9|AllSat|All Saturday|Saturday|1,2,3,4,5|NULL|NULL
+
+##### HOLIDAYLIST #####
+HOLIDAYLIST|1|Christmas
+HOLIDAYLIST|2|New Year
+HOLIDAYLIST|3|National Day
+HOLIDAYLIST|4|Martyr Day
+HOLIDAYLIST|5|Eid Holidays
+HOLIDAYLIST|6|ST Patrik Day
+HOLIDAYLIST|7|Special Holiday
+HOLIDAYLIST|8|Islamic New Year
+HOLIDAYLIST|9|Mawlid Holiday
+
+##### MSG #####
+MSG|2|Incorrect username and/or password. Please try again or click on Forgot Password to create a new password|Invalid Login|7
+MSG|4|Data retrieved successfully|Success Message|9
+MSG|5|Data Updated Successfully|Records Update successfully|9
+MSG|6|EmailId already exists|User Setup|7
+MSG|7|Employee code already exists.|Employee code|7
+MSG|8|Email send Succesfully|Email Send|9
+MSG|9|File downloaded Successfully|File Download|9
+MSG|10|Holiday Detail Already Exist|Holiday Details|7
+MSG|11|WOF List Already Exist|WeekilyConfig|7
+MSG|12|Site Already Exist for this year|WeekilyConfig|7
+MSG|13|Comp Off can be applied on Holidays and Weekends|Comp Off date|7
+MSG|14|Comp Off request expired|Comp Off date|7
+MSG|15|Comp Off request already exists for the date|Comp Off date|7
+MSG|16|Leave Already Exist for the user in the selected Dates|Leave|7
+MSG|17|Annual Leave Can't be taken in june to august |Leave|7
+MSG|18|Available Leave is  less than applied|Leave|7
+MSG|19|File upload successfully|File Upload|9
+MSG|20|Mandatory fields are not present|File Upload|7
+MSG|21|Data Missing|File Upload|7
+MSG|22|Records Downloaded Successfully|Records Downloaded Successfully|9
+MSG|23|Column is missing {{0}}|Column Missing|7
+MSG|24|Invalid data|Invalid data|7
+MSG|25|Mandatory fields missing|Mandatory|7
+MSG|26|All user should be Processed Together |Attendance Process|8
+MSG|28|Shift Name Already Exists|Shift Master|7
+MSG|29|Month is already processed|Leave|7
+MSG|30|Incorrect password|Payroll|7
+MSG|31|Basic Salary not found|Final Settlement|7
+MSG|32|Employee details missing|Final Settlement|7
+MSG|33|Attendance is not processed|Final Settlement|7
+MSG|34|Special leave already exist for the selected reason|Leave|7
+MSG|35|Comp off can not apply for selected dates|Leave|7
+MSG|36|Comp Off can not apply for future date|Comp Off|7
+MSG|37|Ticket already availed|Ticket Availed|7
+MSG|38|Deduction greater than threshhold value|Deduction|7
+MSG|39|Payroll details missing for employees|Payroll Process|7
+MSG|40|Leave can not be applied for a weekend/holiday|Leave request|7
+MSG|41|Deduction|Deduction Ledger|7
+MSG|42|Absent|Compoff Request|7
+MSG|43|OutTime should be greater than InTime|Muster|7
+MSG|44|Exceeded final marking time limit. Please contact HR to apply for attendnace correction.|Muster|7
+MSG|45|OT Payout already exists for overlapping time period|One or more employees already have OT record that overlaps with selected date range.|7
+MSG|46|Salary payout already exists for an overlapping period.|One or more employees already have a salary payout record that overlaps with the selected date range.|7
+
+##### TZ #####
+TZ|33|Dubai|+04:00|240.00
+TZ|34|India|+5:30|330.00
+TZ|35|Nepal|+5:45|345.00
+
+##### LOCTZ #####
+LOCTZ|1|51|33
+LOCTZ|2|53|33
+LOCTZ|3|191|34
+LOCTZ|4|192|35
+
+##### VISATYPE #####
+VISATYPE|1|Family Visa
+VISATYPE|2|Company Visa
+VISATYPE|3|Partner
+
+##### LANG #####
+LANG|1|Urdu|1
+LANG|2|Hindi|1
+LANG|3|Malayalam|1
+LANG|4|Marathi|1
+LANG|5|Tamil|1
+LANG|6|Telugu|1
+LANG|7|English|1
+LANG|8|Kannada|1
+LANG|9|Bengali|1
+LANG|10|Punjabi|1
+LANG|11|Gujarati|1
+LANG|12|Arabic|1
+LANG|13|Konkani|1
+LANG|14|KUTCHI|1
+LANG|15|Luganda�|1
+LANG|16|Nepali|1
+LANG|17|Saraiki|1
+LANG|18|sinhala|1
+LANG|19|Tagalog|1
+LANG|20|TULU|1

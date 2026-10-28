@@ -1,0 +1,173 @@
+1|User Type|2|Internal|1|1|1
+1|User Type|3|External|2|2|1
+2|User Status|4|Active|1|1|1
+2|User Status|5|Inactive|2|2|1
+3|Log Type|6|Login|1|1|1
+4|Message Type|7|Error|1|1|1
+4|Message Type|8|Warning|2|2|1
+4|Message Type|9|Success|3|3|1
+5|Data Type|99|int|1|1|1
+5|Data Type|100|range|2|2|1
+5|Data Type|101|multiselect|3|3|1
+5|Data Type|102|singleselect|4|4|1
+5|Data Type|103|string|5|5|1
+5|Data Type|173|Year|6|6|1
+5|Data Type|174|Month|7|7|1
+6|Field Data Type     |14|string|1|1|1
+6|Field Data Type     |15|password|2|2|1
+6|Field Data Type     |16|bit|3|3|1
+6|Field Data Type     |17|date|4|4|1
+6|Field Data Type     |19|byte|5|5|1
+6|Field Data Type     |20|int|6|6|1
+6|Field Data Type     |23|upload|7|7|1
+6|Field Data Type     |26|singleselect|8|8|1
+6|Field Data Type     |30|multiselect|9|9|1
+6|Field Data Type     |31|Text|10|10|1
+8|Passport Type|27|Regular|1|1|1
+8|Passport Type|28|Emergency|2|2|0
+8|Passport Type|29|Diplomatic|3|3|0
+9|Marital Status|24|Single|1|1|1
+9|Marital Status|25|Married|2|2|1
+10|Gender|33|Female|1|1|1
+10|Gender|34|Male|2|2|1
+10|Gender|35|Other|3|3|1
+11|BloodGroup|37|A+|1|1|1
+11|BloodGroup|38|A-|2|2|1
+11|BloodGroup|39|B+|3|3|1
+11|BloodGroup|40|B-|4|4|1
+11|BloodGroup|42|O+|5|5|1
+11|BloodGroup|43|O-|6|6|1
+11|BloodGroup|44|AB+|7|7|1
+11|BloodGroup|45|AB-|8|8|1
+12|Source of hire|46|Direct |1|1|1
+12|Source of hire|47|Referral|2|2|1
+12|Source of hire|48|Web |3|3|1
+12|Source of hire|49|Newspaper |4|4|1
+12|Source of hire|50|Advertisement|5|5|1
+13|Location|51|Dubai|1|1|1
+13|Location|53|AbuDhabi|2|2|1
+13|Location|192|Nepal|3|3|1
+13|Location|191|India|4|4|1
+14|Employee Type|55|Permanent|1|1|1
+14|Employee Type|57|On Contract|2|2|1
+14|Employee Type|58|Temporary |3|3|1
+14|Employee Type|59|Intern|4|4|1
+15|Dependant Relation|62|Wife|1|1|1
+15|Dependant Relation|63|Son|2|2|1
+15|Dependant Relation|64|Daughter|3|3|1
+15|Dependant Relation|66|Parent|4|4|1
+15|Dependant Relation|129|Husband|5|5|1
+16|Template Type|67|Email|1|1|1
+16|Template Type|68|SMS|2|2|1
+17|ExitReason|69|Terminated|1|1|1
+17|ExitReason|70|Resigned|2|2|1
+17|ExitReason|71|Absconded|3|3|1
+17|ExitReason|98|Other|4|4|0
+18|Date Range|73|7 Days|7|1|1
+18|Date Range|74|14 days|14|2|1
+18|Date Range|75|30 Days|30|3|1
+18|Date Range|76|60 Days|60|4|1
+18|Date Range|137|90 Days|90|5|1
+18|Date Range|138|More than 90 Days|91|6|1
+19|Leave Type|77|Annual Leave|1|1|1
+19|Leave Type|78|Medical Leave|2|2|1
+19|Leave Type|79|Compensatory Leave|3|3|1
+19|Leave Type|80|Emergency Leave|4|4|1
+19|Leave Type|95|Short Leave|5|5|1
+19|Leave Type|96|Maternity|6|6|1
+19|Leave Type|97|LOP|7|7|1
+19|Leave Type|151|Half Day|8|8|1
+19|Leave Type|152|Special Leave|9|9|1
+19|Leave Type|193|Medical Leave (No Certificate)|10|10|1
+19|Leave Type|194|Bereavement Leave|11|11|1
+19|Leave Type|195|Paternity Leave|12|12|1
+19|Leave Type|196|Other Leave|13|13|1
+20|Leave Status|81|Applied|1|1|1
+20|Leave Status|82|Approved|2|2|1
+20|Leave Status|83|Confirmed|3|3|1
+20|Leave Status|84|Rejected|4|4|1
+20|Leave Status|85|Canceled|5|5|1
+21|Comp off Status|86|Requested|1|1|1
+21|Comp off Status|87|Approved|2|2|1
+21|Comp off Status|88|Rejected|3|3|1
+21|Comp off Status|89|Confirmed|4|4|1
+21|Comp off Status|90|Canceled|5|5|1
+21|Comp off Status|175|Expired|6|6|1
+21|Comp off Status|176|Availed|7|7|1
+22|DayType|91|Half Day|1|1|1
+22|DayType|92|Full Day|2|2|1
+23|DayPart|93|First Part|1|1|1
+23|DayPart|94|Second Part|2|2|1
+24|PayrollType|104|Paid|1|1|1
+24|PayrollType|105|UnPaid|2|2|1
+24|PayrollType|131|Half Day|3|3|1
+24|PayrollType|132|OT|4|4|1
+25|StatusID            |106|Absent|1|1|1
+25|StatusID            |108|Not Approved|2|2|1
+25|StatusID            |107|Present|3|3|1
+25|StatusID            |109|Holiday|4|4|1
+25|StatusID            |110|Not Found Present|5|5|1
+25|StatusID            |111|Worked on Holiday|6|6|1
+25|StatusID            |112|Comp off Availed|7|7|1
+25|StatusID            |113|Late|8|8|1
+25|StatusID            |115|Half Day|9|9|1
+25|StatusID            |116|Weekly Off|10|10|1
+26|OTType|118|Fixed OT|1|1|1
+26|OTType|119|Hourly Based OT|2|2|1
+27|UploadStatus|120|Upload Preview|1|1|1
+27|UploadStatus|121|Process Preview|2|2|1
+27|UploadStatus|122|Upload Completed|3|3|1
+27|UploadStatus|123|Upload Cancelled|4|4|1
+28|AttendanceType|124|Upload|1|1|1
+28|AttendanceType|125|ERP|2|2|1
+29|AttentanceProcessType|126|Attendance Processed|1|1|1
+29|AttentanceProcessType|127|Payslip genarated|2|2|1
+29|AttentanceProcessType|128|Cif Generated|3|3|1
+29|AttentanceProcessType|169|Attendance Locked|4|4|1
+29|AttentanceProcessType|172|Deduction Processed|5|5|1
+30|File Uploaded Type|133|Outtime Updated with hours|1|1|1
+30|File Uploaded Type|134|Outtime Updated without hours|2|2|1
+30|File Uploaded Type|135|Intime/OutTime Updated with hours|3|3|1
+30|File Uploaded Type|136|Intime/OutTime Updated without hours|4|4|1
+31|Overtime Status|139|Open|1|1|1
+31|Overtime Status|140|Processed|2|2|1
+31|Overtime Status|141|CIF Generated|3|3|1
+32|Contract Type|142|Limited Contract|1|1|1
+32|Contract Type|143|Unlimited Contract|2|2|1
+33|GratuityStatus|144|Draft|1|1|1
+33|GratuityStatus|145|Pending for Approval|2|2|1
+33|GratuityStatus|146|Approved|3|3|1
+33|GratuityStatus|147|Paid|4|4|1
+34|SpecialLeaveResonType|149|Marriage|1|1|1
+34|SpecialLeaveResonType|150|Demise|2|2|1
+35|AirTravelType|162|Airfare|1|1|1
+35|AirTravelType|163|Airticket|2|2|1
+36|AirTicketReqStatus|164|Requested|1|1|1
+36|AirTicketReqStatus|165|Approved|2|2|1
+36|AirTicketReqStatus|166|Confirmed|3|3|1
+36|AirTicketReqStatus|167|Rejected|4|4|1
+36|AirTicketReqStatus|168|Cancelled|5|5|1
+37|Expired Date Range|153|7 Days|7|1|1
+37|Expired Date Range|154|14 Days|14|2|1
+37|Expired Date Range|155|30 Days|30|3|1
+37|Expired Date Range|156|60 Days|60|4|1
+37|Expired Date Range|157|90 Days|90|5|1
+37|Expired Date Range|158|All|91|6|1
+38|Ticket Eligibility|160|12 Month|12|1|1
+38|Ticket Eligibility|161|24 months|24|2|1
+39|Ledger Type|170|Credit|1|1|1
+39|Ledger Type|171|Debit|2|2|1
+40|Muster Status|177|Absent|1|1|1
+40|Muster Status|178|Not Approved|2|2|1
+40|Muster Status|179|Present|3|3|1
+40|Muster Status|180|Holiday|4|4|0
+40|Muster Status|181|Not Found Present|5|5|1
+40|Muster Status|182|Worked on Holiday|6|6|1
+40|Muster Status|183|Comp off Availed|7|7|0
+40|Muster Status|184|Late|8|8|1
+40|Muster Status|185|Half Day|9|9|1
+40|Muster Status|186|Weekly Off|10|10|0
+41|Mood|187|Happy|1|1|1
+41|Mood|188|Sad|2|2|1
+41|Mood|189|OK|3|3|1
+41|Mood|190|None|4|4|1

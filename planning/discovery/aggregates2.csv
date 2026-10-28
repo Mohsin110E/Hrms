@@ -1,0 +1,35 @@
+t              |total_active|expiry_null|expiry_set |min_exp         |max_exp         
+---------------|------------|-----------|-----------|----------------|----------------
+DOC_EXPIRY_NULL|        3126|       3126|          0|            NULL|            NULL
+t           |MetaDataDetailId|FieldName                                         |DocumentType|cnt        |unparsable 
+------------|----------------|--------------------------------------------------|------------|-----------|-----------
+EXTRA_EXPIRY|            1154|ExpiryDate                                        |         107|        555|          0
+EXTRA_EXPIRY|            1151|ExpiryDate                                        |           4|          1|          0
+EXTRA_EXPIRY|            1149|ExpiryDate                                        |           2|        755|          0
+EXTRA_EXPIRY|            1153|ExpiryDate                                        |           6|         40|          0
+EXTRA_EXPIRY|            1150|ExpiryDate                                        |           3|        835|          0
+EXTRA_EXPIRY|              28|ExpiryDate                                        |           1|        939|          0
+t             |StatusId|ParameterValue|Text                                                                                                                                                                                                                                                      |cnt        
+--------------|--------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------
+PROFILE_STATUS|       5|             2|Inactive                                                                                                                                                                                                                                                  |        380
+PROFILE_STATUS|       4|             1|Active                                                                                                                                                                                                                                                    |        472
+t            |UserTypeId|Name                                                                                                                                                  |cnt        
+-------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------|-----------
+SITEUSER_TYPE|         1|Executive                                                                                                                                             |        468
+SITEUSER_TYPE|         4|HR Admin                                                                                                                                              |         11
+SITEUSER_TYPE|         2|Manager                                                                                                                                               |         29
+SITEUSER_TYPE|         3|System Admin                                                                                                                                          |          2
+t               |LogTypeId|Text                                                                                                                                                                                                                                                      |cnt        
+----------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------
+ACTIVITY_LOGTYPE|        6|Login                                                                                                                                                                                                                                                     |      33508
+t             |with_linkid
+--------------|-----------
+PROFILE_LINKID|        427
+t          |MetaDataConfigId|MetaDataId |MetaDataConfigName                                                                                                                                    |MetaDataConfigValue|IsMultpleInsert|DisplayOrder
+-----------|----------------|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|---------------|------------
+META_CONFIG|               1|          5|Basic                                                                                                                                                 |                  1|           NULL|           1
+META_CONFIG|               2|          6|Employment                                                                                                                                            |                  1|           NULL|           2
+META_CONFIG|               3|         27|User Credentials                                                                                                                                      |                  1|           NULL|           4
+META_CONFIG|               4|         10|Personal                                                                                                                                              |                  1|           NULL|           6
+META_CONFIG|               6|          7|Bank                                                                                                                                                  |                  1|           NULL|           8
+META_CONFIG|               8|         29|Other                                                                                                                                                 |                  1|           NULL|           3

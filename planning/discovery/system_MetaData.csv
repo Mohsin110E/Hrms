@@ -1,0 +1,42 @@
+1|Language|master.Language|LanguageId|1|0|0|NULL|NULL
+2|Role|master.Role|RoleId|1|0|0|NULL|NULL
+3|Site|master.Site|SiteId|1|0|0|NULL|NULL
+4|Department|master.Department|DepartmentId|1|0|0|NULL|NULL
+5|Basic Profile|usr.Profile|ProfileId|2|0|0|NULL|NULL
+6|Work Employee|usr.Employee|EmployeeId|1|0|0|NULL|NULL
+7|Bank|usr.Account|AccountId|1|0|0|NULL|NULL
+8|Document|HRMS.Document|DocumentId|1|0|0|NULL|NULL
+9|FileDocMapping|master.FileDocMapping|FileDocMappingId|1|0|0|NULL|NULL
+10|Personal|usr.Profile|ProfileId|1|0|0|NULL|NULL
+11|Profile|usr.Profile|ProfileId|1|0|0|NULL|NULL
+12|Employee|usr.Employee|EmployeeId|1|0|0|NULL|NULL
+13|Employee Details|usr.Employee|EmployeeId|1|0|0|NULL|NULL
+14|Profile|usr.Profile|ProfileId|1|0|0|NULL|NULL
+15|Exit Details|usr.Employee|EmployeeId|1|0|0|NULL|NULL
+16|MetaData|system.MetaData|MetaDataId|1|0|0|NULL|NULL
+17|MetaDataDetail|system.MetaDataDetail|MetaDataDetailId|1|0|0|NULL|NULL
+18|MetaDataConfig|system.MetaDataConfig|MetaDataConfigId|1|0|0|NULL|NULL
+19|Parameter|system.Parameter|ParameterId|1|0|0|NULL|NULL
+20|Role Leave Entitlement|system.RoleLeaveEntitlement|RoleLeaveEntitlementId|1|0|0|NULL|NULL
+21|Document Type|master.DocumentType|DocumentTypeId|1|0|0|NULL|NULL
+22|Menu Item|system.MenuItem|MenuItemId|1|0|0|NULL|NULL
+23|Payroll Type|master.PayrollType|PayrollTypeId|1|0|0|NULL|NULL
+24|Payroll Header|master.PayrollHeader|PayrollHeaderId|1|0|0|NULL|NULL
+25|Document Report|DocumentReport|DocumentReport|1|0|0|NULL|NULL
+26|Leave Report|LeaveReport|LeaveReport|1|0|0|NULL|NULL
+27|SiteUser|usr.SiteUser|SiteUserId|1|0|0|NULL|NULL
+28|OTConfig|master.OTConfig|OTConfigId|1|0|0|NULL|NULL
+29|Other|usr.Profile|ProfileId|1|0|1|NULL|NULL
+30|User Credentials|usr.Profile|ProfileId|1|0|1|NULL|NULL
+31|Payroll Batch|Master.PayrollBatch|PayrollBatchId|1|0|0|NULL|NULL
+32|Expired Document Report|ExpiredDocumentReport|ExpiredDocumentReport|1|NULL|NULL|NULL|NULL
+33|Expiring Document Report|ExpiringDocumentReport|ExpiringDocumentReport|1|NULL|NULL|NULL|NULL
+34|Employee Profile Report|EmployeeProfileReport|EmployeeProfileReport|1|NULL|NULL|NULL|NULL
+35|Organization Airfare|master.OrganizationAirfare|AirfareId|1|0|0|NULL|NULL
+36|Leave Summary|LeaveSummary|LeaveSummary|1|NULL|NULL|NULL|NULL
+37|Leave Record Report|LeaveRecordReport|LeaveRecordreport|1|0|0|NULL|NULL
+38|Deduction Type|master.DeductionType|DeductionTypeId|1|0|0|NULL|NULL
+39|Gratuity Report |GratuityReport|GratuityReport|1|0|0|NULL|NULL
+40|Payroll Report|PayrollReport|PayrollReport|1|0|0|NULL|NULL
+41|Lulu Template Report|Lulu Template|LuluTemplate|1|0|0|NULL|NULL
+42|Increment Report|IncrementReport|IncrementReport|1|0|0|NULL|NULL

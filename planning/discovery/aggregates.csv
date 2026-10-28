@@ -1,0 +1,34 @@
+t        |total      |expires_null|expires_eq_issued|oldest                 |newest                 
+---------|-----------|------------|-----------------|-----------------------|-----------------------
+TOKEN_SYS|         85|           0|               85|2021-03-01 10:59:50.387|2026-10-22 10:29:41.957
+t         |total      
+----------|-----------
+TOKEN_HRMS|          4
+t       |total      |distinct_usernames|distinct_profiles|empty_password
+--------|-----------|------------------|-----------------|--------------
+SITEUSER|        510|               507|              510|             0
+t           |total      |locked     |max_failed 
+------------|-----------|-----------|-----------
+SITEUSER_ACT|        123|          0|          0
+t       |DocumentTypeId|DocumentName                                                                                                                                                                                            |cnt        |active     
+--------|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|-----------
+DOCUMENT|           109|Warning Letter                                                                                                                                                                                          |          3|          3
+DOCUMENT|             6|Driving License                                                                                                                                                                                         |         40|         39
+DOCUMENT|           107|Visa                                                                                                                                                                                                    |        556|        525
+DOCUMENT|             3|Emirates Id                                                                                                                                                                                             |        837|        784
+DOCUMENT|             2|Work Permit                                                                                                                                                                                             |        757|        715
+DOCUMENT|             1|Passport                                                                                                                                                                                                |       1085|       1059
+DOCUMENT|             4|Health Insurance                                                                                                                                                                                        |          1|          1
+t      |FileDocTypeId|cnt        
+-------|-------------|-----------
+FILEDOC|            3|        556
+FILEDOC|            6|         49
+FILEDOC|          107|        400
+FILEDOC|            1|       9656
+FILEDOC|            2|        402
+t         |total      
+----------|-----------
+FILEDOCMAP|       3269
+t         |with_expiry|expired    |future     
+----------|-----------|-----------|-----------
+DOC_EXPIRY|       3126|          0|          0

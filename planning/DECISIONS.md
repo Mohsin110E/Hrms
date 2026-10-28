@@ -52,3 +52,9 @@ Append-only. Each entry: ID, date, decision, rationale, status (proposed/approve
 ## D-011 — Response/transport redesign
 - Date: 2026-10-28 · Status: **Proposed**
 - Decision: RESTful verbs (GET reads), JSON camelCase, envelopes with `message` compat mapping; pagination response shape adapted to feature (`Pages/TotalRecords`) for parity while internally normalized.
+
+## D-012 — DB discovery authorized under SELECT-only discipline (privileged account)
+- Date: 2026-10-28 · Status: **Approved (owner authorization via chat)**
+- Decision: after read-only verification failed (supplied login is sysadmin/db_owner on `HRMSEmove_Sep3`), the owner explicitly authorized proceeding with discovery **restricted to SELECT + catalog/metadata reads only** — no EXEC, no dynamic SQL, no writes, no procedure execution, credentials never committed.
+- Rationale: owner accepted residual risk for speed; compensating discipline: every statement is a pure SELECT over catalog views/tables; all outputs are schema metadata, aggregates, or config (no bulk PII).
+- Risk note: this is an exception to the preferred dedicated-read-only-account approach; revisit for future sessions (recommend creating `hrms_ro` login per OQ-1).

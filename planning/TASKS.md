@@ -27,54 +27,61 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Evidence: `planning/SYSTEM_OVERVIEW.md` §6, §8.
 
 ### DISC-05 — End-to-end workflow trace: User Management
-- Priority: P1 · Status: **In progress**
+- Priority: P1 · Status: **Done** (2026-10-28)
 - Trace login, logout, ResetPassword, menus, site users end-to-end (Angular → API → proc → tables).
-- Partial tracing done from source; requires proc bodies (blocked by DB access) to finish.
-- Open: proc bodies `GetLogin`, `AddUpdateSiteUserActivity`, `GetSiteUserMenuItem`, `GetMenuItemList`, `AddUpdateMenuUserType`, `ResetPassword`.
+- Completed with proc bodies: `GetLogin` (token reuse + one-time link token + IsSiteAccess), `AddUpdateSiteUserActivity` (5-attempt lockout), `GetSiteUserMenuItem`/`AddUpdateMenuUserType` (MenuUserType + SpecialUserAccess MERGE), `ResetPassword` (plain UPDATE), `GetSiteUserDataList` (CLR-decrypted passwords).
+- Evidence: `discovery/procs/*.sql`; rules in BUSINESS_RULES.md §UM.
 
 ### DISC-06 — End-to-end workflow trace: Master Data
-- Priority: P1 · Status: **In progress**
+- Priority: P1 · Status: **Done** (2026-10-28)
 - Trace metadata engine (`GetMetaData`, `GetMetaDataList`, `AddUpdateMetaData`), shift master, weekly-off/holiday, employee master.
-- Open: mapping of the dynamically built SQL (in `MasterSetup.cs`) to actual table structures (requires DB metadata evidence).
+- Completed with DB metadata: `system.MetaData` 42 rows / `MetaDataDetail` 241 rows / DataType catalog dumped; `AddUpdateProfile` (74 params) fully decoded incl. ProfileDepartment single-value quirk; shift/weekly-off/holiday procs read.
+- Evidence: `discovery/system_MetaData*.csv`, `discovery/procs/*.sql`; rules §MD.
 
 ### DISC-07 — End-to-end workflow trace: Document Management
-- Priority: P1 · Status: **In progress**
+- Priority: P1 · Status: **Done** (2026-10-28)
 - Trace list/detail/upload/save/zip/download/mail/delete + expiry schedulers.
-- Open: schema of `master.Document`, `master.FileDoc`, `master.FileDocMapping`, `master.AdditinalDocumentValue` tables (DB access).
+- Completed: `AddUpdateDocument` (dynamic SQL, TVPs), `DeleteDocument` (orphans files), `AddUpdateFileDoc` (FileDocTypeId=1 hardcoded), `GetEmployeeDocumentList`/`GetDocumentExpiry`/`GetDocumentsListScheduler` (expiry from AdditinalDocumentValue, windows prev-month/7d/1m/3m), reporting views captured.
+- Evidence: `discovery/procs/*.sql`, `discovery/view_*.sql`; rules §DOC.
 
 ### DISC-08 — Identify behavior gaps (commented-out / dead code)
 - Priority: P2 · Status: **In progress** ·
 - Items: ChangePassword (commented server), ForgotPassword (commented server; client modal calls active endpoint? verify), `/changePassword` dead link, `GetMenuAccessList` unused, `RememberMe` disabled.
 - Output → `OPEN_QUESTIONS.md`.
 
-## DB — Read-only database schema analysis (blocked on verified access)
+## DB — Read-only database schema analysis (done 2026-10-28 under D-012 SELECT-only exception)
 
 ### DB-01 — Verify read-only UAT access
-- Priority: P1 · Status: **Blocked**
-- Steps: confirm DB name = `HRMSEmoveUAT`, confirm login has no INSERT/UPDATE/DELETE/ALTER/CONTROL, record result in PROGRESS.md.
-- Rules: per AGENTS.md §2.2 — never execute procs; never `prisma` against UAT.
+- Priority: P1 · Status: **Done (with exception)** · 
+- Result: login `mohsinsa` on `HRMSEmove_Sep3` @ `emovedb` verified **sysadmin/db_owner — NOT read-only**. Owner explicitly authorized proceeding under SELECT/metadata-only discipline (**D-012**). Recommend dedicated `hrms_ro` login for future sessions (OQ-1).
+- Evidence: verification query output in session log; DECISIONS.md D-012.
 
 ### DB-02 — Schema inventory: tables/columns/keys for modules 1–3
-- Priority: P1 · Status: **Not started** · Depends: DB-01
-- Output → `DATABASE_DISCOVERY.md` (existing draft from EDMX + code analysis to be validated).
+- Priority: P1 · Status: **Done** (2026-10-28)
+- Output: `DATABASE_DISCOVERY.md` rewritten from live schema; `discovery/tables_rows.csv` (107 tables / 5 schemas), `columns_modules.csv`, `columns_usr_employee.csv`, `constraints.csv` (FK/UQ graph).
+- Headlines: no unique on SiteUser.UserName; FileDocTypeId→DocumentType FK naming trap; dual Token tables; 0 triggers.
 
 ### DB-03 — Metadata tables content (system.MetaData, MetaDataDetail, Parameter)
-- Priority: P1 · Status: **Not started** · Depends: DB-01
-- SELECT-only extracts of master/document field definitions (these drive UI + dynamic SQL).
+- Priority: P1 · Status: **Done** (2026-10-28)
+- Extracts: `system_MetaData.csv` (42), `system_MetaDataDetail.csv` (241), `system_parameters.csv`, `datatype_map.csv` (14=string … 31=Text), `config_tables.csv`, `messageview.csv`.
+- Confirms D-003 definitions-driven engine feasibility; document expiry fields identified per document type.
 
 ### DB-04 — Stored procedure source text for module procs (read, never execute)
-- Priority: P1 · Status: **Not started** · Depends: DB-01
-- Procs list (from EDMX function imports): `GetLogin`, `ResetPassword`, `AddUpdatePassword`, `AddUpdateProfile`, `AddUpdateSiteUserActivity(?)`, `GetSiteUserMenuItem`, `GetMenuItemList`, `GetMenuList`, `GetMenuUserTypeList`, `AddUpdateMenuUserType`, `GetMenuAccessList`, `GetShiftMaster`, `AddUpdateShiftMaster`, `GetWeeklyOffList`, `AddUpdateWeeklyOffList`, `AddUpdateHoliday(List)`, `GetProfileList`, `AddUpdateDocument`, `DeleteDocument`, `AddUpdateFileDoc`, `GetEmployeeDocumentList`, `GetDocumentExpiry`, `GetExpiredDocumentList`, `GetDocumentsListScheduler`, `GetDocumentReport/(Ex)pired/ExpiringDocumentReport`, schedule-related `LeaveScheduler`/`AirfareScheduler` (out-of-scope interplay though), `AddUpdateProfilePhoto`, `AddUpdateProfileLinkId`.
+- Priority: P1 · Status: **Done** (2026-10-28)
+- 38 module-relevant proc definitions dumped via `OBJECT_DEFINITION` → `discovery/procs/*.sql`; all read & rule-extracted (see DATABASE_DISCOVERY.md §5, BUSINESS_RULES.md).
+- Remaining ~160 procs (leave/payroll/attendance) out of phase-1 scope; dump on demand in Phase 2.
 
 ### DB-05 — Views, triggers, indexes, unique constraints of relevance
-- Priority: P2 · Status: **Not started** · Depends: DB-01
+- Priority: P2 · Status: **Done** (2026-10-28)
+- 46 views listed (`views.csv`); 0 triggers; unique constraints sparse (constraints.csv); 3 document-report view definitions captured.
 
 ### DB-06 — Row counts + data type audit (aggregates only)
-- Priority: P3 · Status: **Not started** · Depends: DB-01
-- No bulk PII extraction; counts + nulls distribution only.
+- Priority: P3 · Status: **Done** (2026-10-28)
+- Aggregates-only (no bulk PII): `aggregates.csv`, `aggregates2.csv` — token expiry stats, SiteUser dup counts, document-type distribution, expiry-value counts (3,125, 0 unparsable), profile status split, activity-log type census.
 
 ### DB-07 — SQL Server → PostgreSQL mapping (drafted, validate against DB-02..05)
-- Priority: P2 · Status: **In progress** (draft in DATABASE_DISCOVERY.md)
+- Priority: P2 · Status: **Validated** (2026-10-28)
+- Mapping table in DATABASE_DISCOVERY.md §9 updated against real data types; TVP/CLR/dynamic-SQL conversion notes recorded; mixed-format date strings flagged for ETL.
 
 ## UM — User Management
 
@@ -115,7 +122,7 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Priority: P2 · Status: **Not started** · Depends: DB-04 (scheduler procs)
 
 ### DOC-04 — Document data model (Document, FileDoc, FileDocMapping, type tables)
-- Priority: P1 · Status: **Blocked** · Depends: DB-02/DB-04
+- Priority: P1 · Status: **Not started (unblocked)** · DB-02/DB-04 complete — real model documented in DATABASE_DISCOVERY.md §4.
 
 ## ARCH — Target architecture
 
@@ -123,7 +130,7 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Priority: P1 · Status: **In progress** · Evidence: TARGET_ARCHITECTURE.md
 
 ### ARCH-02 — Prisma schema draft for models in scope
-- Priority: P1 · Status: **Not started** · Depends: DB-02, DB-03, DB-04
+- Priority: P1 · Status: **Not started (unblocked)** · DB-02/03/04 complete — schema evidence in DATABASE_DISCOVERY.md.
 
 ### ARCH-03 — API conventions & error model (incl. MessageId mapping)
 - Priority: P2 · Status: **Not started**

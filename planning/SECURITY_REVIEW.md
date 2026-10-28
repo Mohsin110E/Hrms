@@ -1,6 +1,6 @@
 # SECURITY_REVIEW.md — Legacy Security Findings & Target Security Design
 
-Scope: source-level review of `D:\.net\hrms` (read-only). No exploitation performed; findings reported responsibly.
+Scope: source-level review of `D:\.net\hrms` (read-only) + live DB metadata inspection of `HRMSEmove_Sep3` under SELECT-only discipline (D-012, 2026-10-28). No exploitation performed; findings reported responsibly.
 Severity: 🔴 high / 🟠 medium / 🟡 low / INFO.
 
 ## 1. Legacy findings
@@ -20,14 +20,19 @@ Severity: 🔴 high / 🟠 medium / 🟡 low / INFO.
 | SEC-L-11 | 🟡 | Error handling returns 200 for missing auth header; generic 400 on exceptions; detailed stack traces in committed log files (some with identifiers) | `ActionFilter.cs`, `ExceptionLog\*.txt` | info leakage |
 | SEC-L-12 | 🟡 | No audit trail for document view/download/upload beyond email logs; lockout threshold unknown (proc body needed) | review | compliance gap |
 | SEC-L-13 | INFO | Response always POST; no security headers config found (HSTS, CSP) — unknown at IIS level | `web.config` | unknown |
-| SEC-L-14 | INFO | Failed login count/lock: `AddUpdateSiteUserActivity` exists (proc body inspection pending) | EDMX | unknown |
+| SEC-L-14 | INFO | Failed login count/lock: `AddUpdateSiteUserActivity` — **DB-confirmed: locks at 5 failed attempts; success resets; but 0 locked users / max_failed=0 in data (effectively inert)** | `discovery/procs/AddUpdateSiteUserActivity.sql`; `discovery/aggregates.csv` |
+| SEC-L-15 | 🔴 | **SQL CLR crypto assembly `SMISQLDataApp` (SAFE_ACCESS) installed with `clr enabled=1`; `dbo.Encrypt`/`dbo.Decrypt` scalar functions** — the database itself can decrypt any credential | `discovery/fn_search2.csv`, `discovery/clr_assemblies.csv` |
+| SEC-L-16 | 🔴 | **`GetSiteUserDataList` decrypts passwords inside SQL (CLR `DBO.decrypt`) and returns plaintext passwords to the client** — mass credential disclosure on every user-list view | `discovery/procs/GetSiteUserDataList.sql` |
+| SEC-L-17 | 🟠 | **Plaintext PII on `usr.Profile`**: PassportNo, EmiratesId, MOLNo, VisaNo stored unencrypted while site credentials are DES — inconsistent protection; 852 profiles incl. 380 inactive retained | `discovery/columns_usr_employee.csv` |
+| SEC-L-18 | 🟠 | **Destructive maintenance procs shipped to production**: `CleanupUser` (wipes all data keeping only ProfileId 126), `CleanupInActiveUser` (deletes inactive profiles + hardcoded FileDocIds 227–231) | `discovery/procs/CleanupUser.sql`, `CleanupInActiveUser.sql` |
+| SEC-L-19 | 🟠 | **`system.Configuration` row 13 stores an encrypted secret (`PayrollPassword`) — value redacted from all committed docs**; treated as compromised, rotate at cutover. (Encrypted payroll config secret also implies payroll subsystem credentials in DB config) | `discovery/config_tables.csv` |
 
 ## 2. Target security design (proposal)
 
 | Area | Proposal |
 |---|---|
 | Password storage | **[proposed]** bcrypt cost ≥ 12 (or argon2id); no reversible crypto; per-user salt from hash string |
-| Password migration | **[open]** DES values cannot be verified → options: (a) forced reset-all at cutover; (b) on-login rehash: first login decrypts DES value server-side, verifies match, then hashes and upgrades row. Requires keeping legacy decrypt with restricted use and destroying after migration window. Needs decision (D-005, OQ-3) |
+| Password migration | **[open]** DES values cannot be verified → options: (a) forced reset-all at cutover; (b) on-login rehash: first login decrypts DES value server-side, verifies match, then hashes and upgrades row. Requires keeping legacy decrypt with restricted use and destroying after migration window. Needs decision (D-005, OQ-3). **DB evidence raises the stakes: SEC-L-15/16 mean decrypted credentials were routinely exposed — reset-all is the recommended default.** |
 | Sessions | **[proposed]** short-lived JWT access (15 min) + opaque refresh token (server-side, revocable, `expires_at` enforced, sliding idle expiry ≤ legacy 180 min), revoke on logout, token rotation, reuse detection |
 | AuthN flow | **[proposed]** strict whitelist for unauthenticated endpoints (`/auth/login`, `/auth/forgot-password`); account lockout with threshold from legacy proc evidence; rate limiting on login/forgot; failed-attempt audit preserved |
 | Password policy | **[proposed]** adopt legacy regex (BR-UM-10) server-side: 8–15 with upper/lower/digit/special — revisit length-first NIST-style policy with stakeholders **[open]** |
@@ -36,7 +41,7 @@ Severity: 🔴 high / 🟠 medium / 🟡 low / INFO.
 | XSS | **[proposed]** React/Angular escaping; sanitize any rich text (email HTML preview) |
 | SQL injection | **[proposed]** Prisma parameterization everywhere; NO dynamic string SQL anywhere; metadata engine rebuilt over definitions tables with typed columns/JSONB, no string-concat SQL |
 | File security | **[proposed]** private storage (folder outside web root or object storage with signed URLs); download via authenticated endpoint that checks document ownership/permissions; UUIDs for file names; strip/full preserve original name in metadata only; extension+size checks server-side (jpg/jpeg/png/pdf ≤ 10 MB; photos jpg/jpeg/png ≤ 10 MB; import xls/xlsx/xlsm/csv) — from BR-MD-09/DOC-05; consider AV scan hook; **no public URL preview** — inline render via signed, short-lived URLs |
-| PII (passport/visa/Emirates ID/licence) | **[proposed]** restrict fields to authorized roles; mask in list views (last 4); full number only in detail view with audit; never log |
+| PII (passport/visa/Emirates ID/licence) | **[proposed]** restrict fields to authorized roles; mask in list views (last 4); full number only in detail view with audit; never log. **DB evidence: legacy stores these plaintext on `usr.Profile` (SEC-L-17) — target adds encryption-at-rest or equivalent (OQ-16)** |
 | Audit logging | **[proposed]** append-only audit table: logins, lockouts, password changes/resets, document view/download/upload/replace/delete, master data changes, with actor, IP, timestamp |
 | Transport | **[proposed]** HTTPS-only, HSTS, secure cookies, prepared CSP, strict CORS allowlist |
 | Secrets | **[proposed]** env-based config, `.env` git-ignored, `.env.example` placeholders; secrets manager in deployment; all legacy committed secrets treated as compromised → rotate at cutover |

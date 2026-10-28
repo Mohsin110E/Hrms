@@ -2,9 +2,10 @@
 
 Each item: ID, question, why it matters, evidence gap, impact if unanswered.
 
-## OQ-1 — Confirmed read-only UAT credentials (BLOCKER)
-- Question: provide a SQL Server account for **UAT only** with SELECT + metadata permissions; confirm intended discovery DB is `HRMSEmoveUAT` (not the `HRMSEmove_Sep3` referenced in current configs).
-- Gap: no DB access yet. Impact: DB discovery (DB-02..06), proc bodies for all module rules, metadata content, and the migration mapping validation are all blocked.
+## OQ-1 — Read-only UAT credentials (RESOLVED via exception; safe account still recommended)
+- Update 2026-10-28 (final): credentials for `HRMSEmove_Sep3` @ `emovedb` verified **sysadmin/db_owner — NOT read-only**. Owner explicitly authorized SELECT/metadata-only discovery with this account (**D-012**). All DB-01..06 tasks completed under that discipline (no EXEC, no writes, credentials never committed).
+- **Remaining ask:** create a dedicated read-only login (`hrms_ro`, SELECT + VIEW DEFINITION only) for all future sessions — this account should not be reused, and should be rotated (it is also committed in legacy repo configs, see SEC-L-08).
+- Note: `HRMSEmoveUAT` (from commented configs) was never used; `HRMSEmove_Sep3` is the active DB in all legacy app configs and was used as the discovery source (newest token 2026-10-22 → actively used copy).
 
 ## OQ-2 — Forgot password / change password intent
 - Question: are these flows *planned but unfinished* (commented-out server code, dead UI route) — and do you want them in the new system Phase 1?
@@ -48,6 +49,20 @@ Each item: ID, question, why it matters, evidence gap, impact if unanswered.
 
 ## OQ-12 — Legacy "Token reuse" behavior
 - Question: `GetLogin` may return an existing AuthToken — intended multi-device behavior or accident? Confirm expected multi-session behavior in the new system.
+- Update 2026-10-28: **proc body confirms reuse is real** (existing `system.Token` row returned when present). Question stands for the target design.
 
 ## OQ-13 — Document no. uniqueness & per-type numbering
 - Question: any uniqueness requirements for DocumentNo per type/employee/country (proc bodies pending). Emirates ID `PersonIDNumber≥14` exists in profile meta; document-level numbering undecided.
+- Update 2026-10-28: `HRMS.Document` has **no document-number field and no unique constraints** beyond PK; `IdentityNo`/`DocumentTitle` are free-text. Business to confirm if numbering is needed in target.
+
+## OQ-14 — Duplicate data resolution before cutover (new, from DB evidence)
+- Question: how to resolve (a) 3 duplicate `SiteUser.UserName` values, (b) duplicate `Role` name "Admin" (RoleId 1 and 7), (c) 9,656 `FileDoc` rows miscategorized as type 1 by the hardcoded insert — dedupe/correct in legacy first, or fix during migration ETL?
+- Impact: uniqueness constraints in target schema; migration reconciliation queries (MIG-04).
+
+## OQ-15 — `dbo` junk tables & destructive procs (new, from DB evidence)
+- Question: confirm the 14 Excel-import tables (`'Dec 2021$'`, `OT$`, `Sheet2$`, `temp`, …) and maintenance procs (`CleanupUser`, `CleanupInActiveUser`) are safe to leave behind (not migrated, never re-run). Any process still using them?
+- Impact: migration scope; legacy hardening.
+
+## OQ-16 — Plaintext PII protection in target (new, from DB evidence)
+- Question: `usr.Profile` stores PassportNo/EmiratesId/MOLNo/VisaNo in plaintext — should the target encrypt-at-rest (pgcrypto/KMS) or rely on RBAC + audit? Who may view full values vs masked?
+- Impact: schema design, security review §PII, migration of identity columns.
