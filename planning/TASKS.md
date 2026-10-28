@@ -129,7 +129,7 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 ## ARCH — Target architecture
 
 ### ARCH-01 — Modular monolith skeleton (proposal)
-- Priority: P1 · Status: **In progress** · Evidence: TARGET_ARCHITECTURE.md
+- Priority: P1 · Status: **In progress (scaffolded)** · Evidence: `src/app.module.ts`, `src/{auth,users,rbac,masters,employees,documents,health,prisma,common}`; `nest build` succeeds.
 
 ### ARCH-02 — Prisma schema draft for models in scope
 - Priority: P1 · Status: **Done (draft, validated)** · 2026-10-28
@@ -138,7 +138,7 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Pending: owner review of NEW decisions embedded in the draft (UTC timestamp semantics, Session lockout window, token retention/expiry, and target constraint enforcement); Prisma version bump when the project moves to a supported Node LTS.
 
 ### ARCH-03 — API conventions & error model (incl. MessageId mapping)
-- Priority: P2 · Status: **Done** · Conventions embedded in `planning/API_SPECIFICATION.md` §1.
+- Priority: P2 · Status: **Done** · Conventions embedded in `planning/API_SPECIFICATION.md` §1 and implemented in `src/common/filters`, `src/common/interceptors`.
 
 ### ARCH-04 — API_SPECIFICATION.md for the 3 modules
 - Priority: P2 · Status: **Done** · Output: `planning/API_SPECIFICATION.md` — endpoints for auth/users/rbac, masters/employees, and documents.

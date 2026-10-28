@@ -1,7 +1,7 @@
 # PROGRESS.md — HRMS Modernization Status
 
 **Last updated:** 2026-10-28
-**Current phase:** Phase 2 — Target design (**started after owner review; Prisma schema draft complete and under design review**)
+**Current phase:** Phase 3 — Development scaffold complete; implementation starting with auth vertical slice
 
 ## Overall completion
 
@@ -14,8 +14,8 @@
 | Auxiliary projects (services, CI/CD, docs) | **Reviewed** |
 | UAT database schema discovery | **Done** (2026-10-28 — live SELECT-only inspection under D-012; see DATABASE_DISCOVERY.md) |
 | Business rule extraction | **Done for phase-1 scope** (source + proc bodies + data evidence; see BUSINESS_RULES.md) |
-| Target architecture | **In progress** (proposal updated for Phase 2; API spec complete; ready for dev scaffolding) |
-| Prisma target schema | **Done (draft/validated)** (`prisma/schema.prisma`, 37 models; Prisma validation clean) |
+| Target architecture | **In progress** (scaffolded; modules wired; build passes) |
+| Prisma target schema | **Done (draft/validated)** (`prisma/schema.prisma`, 37 models) |
 | API specification | **Done (draft)** (`planning/API_SPECIFICATION.md`) |
 | Data migration plan | **In progress** (D-014/D-016 incorporated; reconciliation and storage decisions remain) |
 | Security review | **Reviewed** (source + DB-level findings SEC-L-15..19; see SECURITY_REVIEW.md) |
@@ -137,7 +137,8 @@ Top items (full list in OPEN_QUESTIONS.md):
 
 ## Next recommended actions (priority order)
 
-1. **Start development scaffolding** (ARCH-01): NestJS modular monolith, Prisma client, config module, health endpoints, and the `auth` module login/session slice.
-2. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
-3. Produce the MIG-04 reconciliation report before any ETL or migration work.
-4. Iterate module-by-module against `API_SPECIFICATION.md` and `BUSINESS_RULES.md`.
+1. **Implement the auth vertical slice**: real password verification (bcrypt + legacy DES fallback D-014), session/refresh rotation, logout revocation, account lockout, audit logging.
+2. Implement seed scripts for lookup tables (UserType, Role, Parameter, DocumentType, Message, Configuration, FormEntity/FormField).
+3. Implement users, RBAC, masters, employees, and documents module-by-module against `API_SPECIFICATION.md`.
+4. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
+5. Produce the MIG-04 reconciliation report before any ETL or migration work.
