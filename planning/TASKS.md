@@ -90,14 +90,14 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Evidence: MODULE_INVENTORY.md §Module 1.
 
 ### UM-02 — Authentication redesign (bcrypt, JWT+refresh, expiry, lockout)
-- Priority: P1 · Status: **In progress** (design fixed by D-014 legacy-compat flow + D-007 sessions; implemented in schema draft)
+- Priority: P1 · Status: **Implemented** — `src/auth/auth.service.ts`, `auth.controller.ts`, DTOs, lockout, session rotation, audit logging.
 - Password migration decided: **D-014** — legacy DES value verified server-side on first login → `mustChangePassword` prompt → bcrypt thereafter; `legacyPasswordEnc` dropped after window.
 
 ### UM-03 — Menu/rights model design
-- Priority: P1 · Status: **In progress** (MenuUserType base + MenuUserOverride modeled in schema; parity with GetSiteUserMenuItem logic)
+- Priority: P1 · Status: **In progress** (MenuUserType base + MenuUserOverride modeled in schema; seed menu items added; parity with GetSiteUserMenuItem logic pending controller implementation)
 
 ### UM-04 — Forgot/change password flows (currently missing/commented)
-- Priority: P2 · Status: **Unblocked** (D-013: both flows are IN scope) — email token flow (forgot) + current-password-verified self change.
+- Priority: P2 · Status: **Implemented** — forgot/reset/change endpoints with hashed reset tokens and audit logging (email sending deferred/TODO).
 
 ## MD — Setup / Master Data
 
@@ -177,9 +177,31 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 ### TEST-02 — Rule-based regression test matrix (BR-UM/MD/DOC ids)
 - Priority: P2 · Status: **Not started** · Depends: BUSINESS_RULES completion
 
-## DEV — Future implementation (Phase 4 — NOT TO START before approval)
+## DEV — Implementation (Phase 3 — active)
 
-### DEV-01..n — placeholder; ownership/priority assigned post-approval. Status: Not started (locked).
+### DEV-01 — NestJS modular monolith scaffold
+- Priority: P1 · Status: **Done** — modules, config, Prisma, health, common filters/interceptors/guards, Swagger, build passes.
+
+### DEV-02 — Auth vertical slice
+- Priority: P1 · Status: **Done** — login/logout/refresh, lockout, forgot/reset/change password, session rotation, audit logging.
+
+### DEV-03 — Lookup seed scripts
+- Priority: P1 · Status: **Done** — `prisma/seed.ts` seeds ParameterType/Parameter, Message, SystemConfiguration, UserType, Role, DocumentType, MenuItem (Phase-1 subset).
+
+### DEV-04 — Users module
+- Priority: P1 · Status: **Not started**
+
+### DEV-05 — RBAC module (menu/rights)
+- Priority: P1 · Status: **Not started** · Depends: DEV-03 (menu seed)
+
+### DEV-06 — Masters module
+- Priority: P1 · Status: **Not started**
+
+### DEV-07 — Employees module
+- Priority: P1 · Status: **Not started**
+
+### DEV-08 — Documents module
+- Priority: P1 · Status: **Not started** · Depends: SEC-03/DOC-02 (file storage design)
 
 ## QA — Validation & release
 

@@ -1,7 +1,7 @@
 # PROGRESS.md — HRMS Modernization Status
 
 **Last updated:** 2026-10-28
-**Current phase:** Phase 3 — Development scaffold complete; implementation starting with auth vertical slice
+**Current phase:** Phase 3 — Development (auth slice + seeds complete; module implementation next)
 
 ## Overall completion
 
@@ -17,10 +17,12 @@
 | Target architecture | **In progress** (scaffolded; modules wired; build passes) |
 | Prisma target schema | **Done (draft/validated)** (`prisma/schema.prisma`, 37 models) |
 | API specification | **Done (draft)** (`planning/API_SPECIFICATION.md`) |
+| Auth vertical slice | **Done (first pass)** — `src/auth/*`: bcrypt + DES fallback, lockout, JWT/refresh rotation, forgot/reset/change password, audit logging |
+| Seed scripts | **Done (first pass)** — `prisma/seed.ts` for lookup tables (parameters, messages, config, user types, roles, document types, menu items) |
 | Data migration plan | **In progress** (D-014/D-016 incorporated; reconciliation and storage decisions remain) |
 | Security review | **Reviewed** (source + DB-level findings SEC-L-15..19; see SECURITY_REVIEW.md) |
 | Test strategy | **In progress** (draft proposal) |
-| Implementation (Phase 4) | **Not started** — blocked until Phase 3 review approval |
+| Implementation (Phase 3) | **In progress** — auth vertical slice and seeds complete; users/RBAC/masters/employees/documents pending |
 
 Status vocabulary: Not started / In progress / Reviewed / Validated / Approved / Implemented / Tested.
 "Reviewed" = source surveyed with citations but not executed/verified against a running system or DB.
@@ -137,8 +139,10 @@ Top items (full list in OPEN_QUESTIONS.md):
 
 ## Next recommended actions (priority order)
 
-1. **Implement the auth vertical slice**: real password verification (bcrypt + legacy DES fallback D-014), session/refresh rotation, logout revocation, account lockout, audit logging.
-2. Implement seed scripts for lookup tables (UserType, Role, Parameter, DocumentType, Message, Configuration, FormEntity/FormField).
-3. Implement users, RBAC, masters, employees, and documents module-by-module against `API_SPECIFICATION.md`.
-4. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
-5. Produce the MIG-04 reconciliation report before any ETL or migration work.
+1. **Implement the Users module**: site-user CRUD, admin password reset, deactivation, list/search with PII masking discipline.
+2. **Implement the RBAC module**: effective menu tree, base menu permissions per user type, per-user overrides, `my-menu` endpoint.
+3. **Implement the Masters module**: standard masters (department/site/language/shift/document-type), parameter catalog, metadata definitions.
+4. **Implement the Employees module**: employee/profile CRUD, dependants, photo upload, PII encryption/hashing (D-015).
+5. **Implement the Documents module**: document CRUD, private file upload/download, expiry scheduler (D-017/D-008).
+6. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
+7. Produce the MIG-04 reconciliation report before any ETL or migration work.
