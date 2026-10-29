@@ -28,7 +28,7 @@
 | Security review | **Reviewed** (source + DB-level findings SEC-L-15..19; see SECURITY_REVIEW.md) |
 | Test strategy | **In progress** (draft proposal) |
 | Local DB migration + seeds | **Done** — `prisma/migrations/20261029124942_init` applied; lookup tables seeded; admin bootstrapped; health/login/RBAC smoke-tested |
-| Frontend scaffold | **Implemented (first pass)** — `frontend/`: Next.js 12 + Pages Router, API client, auth context, login/dashboard, `/api/*` rewrite to NestJS |
+| Frontend scaffold | **Implemented with Tailwind CSS** — `frontend/`: Next.js 12 + Pages Router, responsive sidebar layout, styled login/dashboard, module placeholders |
 | Implementation (Phase 3) | **Implemented (first pass)** — all Phase-1 API modules complete; frontend pending |
 
 Status vocabulary: Not started / In progress / Reviewed / Validated / Approved / Implemented / Tested.
