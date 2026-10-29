@@ -18,6 +18,7 @@
 | Prisma target schema | **Done (draft/validated)** (`prisma/schema.prisma`, 37 models) |
 | API specification | **Done (draft)** (`planning/API_SPECIFICATION.md`) |
 | Auth vertical slice | **Done (first pass)** — `src/auth/*`: bcrypt + DES fallback, lockout, JWT/refresh rotation, forgot/reset/change password, audit logging |
+| Users module | **Implemented (first pass)** — `src/users/*`: CRUD, list/search/pagination, admin reset-password, deactivation, audit logging |
 | Seed scripts | **Done (first pass)** — `prisma/seed.ts` for lookup tables (parameters, messages, config, user types, roles, document types, menu items) |
 | Data migration plan | **In progress** (D-014/D-016 incorporated; reconciliation and storage decisions remain) |
 | Security review | **Reviewed** (source + DB-level findings SEC-L-15..19; see SECURITY_REVIEW.md) |
@@ -139,10 +140,9 @@ Top items (full list in OPEN_QUESTIONS.md):
 
 ## Next recommended actions (priority order)
 
-1. **Implement the Users module**: site-user CRUD, admin password reset, deactivation, list/search with PII masking discipline.
-2. **Implement the RBAC module**: effective menu tree, base menu permissions per user type, per-user overrides, `my-menu` endpoint.
-3. **Implement the Masters module**: standard masters (department/site/language/shift/document-type), parameter catalog, metadata definitions.
-4. **Implement the Employees module**: employee/profile CRUD, dependants, photo upload, PII encryption/hashing (D-015).
-5. **Implement the Documents module**: document CRUD, private file upload/download, expiry scheduler (D-017/D-008).
-6. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
-7. Produce the MIG-04 reconciliation report before any ETL or migration work.
+1. **Implement the RBAC module**: effective menu tree, base menu permissions per user type, per-user overrides, `my-menu` endpoint.
+2. **Implement the Masters module**: standard masters (department/site/language/shift/document-type), parameter catalog, metadata definitions.
+3. **Implement the Employees module**: employee/profile CRUD, dependants, photo upload, PII encryption/hashing (D-015).
+4. **Implement the Documents module**: document CRUD, private file upload/download, expiry scheduler (D-017/D-008).
+5. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
+6. Produce the MIG-04 reconciliation report before any ETL or migration work.

@@ -189,7 +189,7 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Priority: P1 · Status: **Done** — `prisma/seed.ts` seeds ParameterType/Parameter, Message, SystemConfiguration, UserType, Role, DocumentType, MenuItem (Phase-1 subset).
 
 ### DEV-04 — Users module
-- Priority: P1 · Status: **Not started**
+- Priority: P1 · Status: **Implemented (first pass)** — site-user CRUD, list/search/pagination, admin reset-password, deactivation, audit logging, password never returned.
 
 ### DEV-05 — RBAC module (menu/rights)
 - Priority: P1 · Status: **Not started** · Depends: DEV-03 (menu seed)
