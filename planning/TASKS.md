@@ -192,7 +192,7 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Priority: P1 · Status: **Implemented (first pass)** — site-user CRUD, list/search/pagination, admin reset-password, deactivation, audit logging, password never returned.
 
 ### DEV-05 — RBAC module (menu/rights)
-- Priority: P1 · Status: **Not started** · Depends: DEV-03 (menu seed)
+- Priority: P1 · Status: **Implemented (first pass)** — user types, roles, menu flat/tree, menu permissions per user type, per-user overrides, effective `my-menu` tree, audit logging.
 
 ### DEV-06 — Masters module
 - Priority: P1 · Status: **Not started**
