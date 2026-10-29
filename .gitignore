@@ -12,6 +12,8 @@ build/
 coverage/
 .cache/
 *.tsbuildinfo
+frontend/.next/
+frontend/out/
 
 # logs
 *.log

@@ -28,6 +28,7 @@
 | Security review | **Reviewed** (source + DB-level findings SEC-L-15..19; see SECURITY_REVIEW.md) |
 | Test strategy | **In progress** (draft proposal) |
 | Local DB migration + seeds | **Done** — `prisma/migrations/20261029124942_init` applied; lookup tables seeded; admin bootstrapped; health/login/RBAC smoke-tested |
+| Frontend scaffold | **Implemented (first pass)** — `frontend/`: Next.js 12 + Pages Router, API client, auth context, login/dashboard, `/api/*` rewrite to NestJS |
 | Implementation (Phase 3) | **Implemented (first pass)** — all Phase-1 API modules complete; frontend pending |
 
 Status vocabulary: Not started / In progress / Reviewed / Validated / Approved / Implemented / Tested.
@@ -145,8 +146,8 @@ Top items (full list in OPEN_QUESTIONS.md):
 
 ## Next recommended actions (priority order)
 
-1. **Run Prisma migration against a local PostgreSQL instance** and verify seed scripts populate lookup tables cleanly.
-2. **Integration/API smoke tests** — test auth, users, employees, documents end-to-end with a real DB.
-3. **Scaffold the Next.js frontend** (app router recommended) and wire it to the API.
+1. **Implement frontend module pages**: users list/create, employees list/create, documents list/upload, masters list/create.
+2. **Add automatic access-token refresh** before expiry and on 401 responses.
+3. **Integration/API smoke tests** with real DB for file upload, employee create, document create.
 4. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
 5. Produce the MIG-04 reconciliation report before any ETL or migration work.

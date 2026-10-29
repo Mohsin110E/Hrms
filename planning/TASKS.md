@@ -177,6 +177,14 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 ### TEST-02 — Rule-based regression test matrix (BR-UM/MD/DOC ids)
 - Priority: P2 · Status: **Not started** · Depends: BUSINESS_RULES completion
 
+## FE — Frontend
+
+### FE-01 — Next.js scaffold + API client
+- Priority: P1 · Status: **Implemented (first pass)** — `frontend/` Next.js 12 (Pages Router) scaffold, API fetch wrapper, auth context, login + dashboard pages, `/api/*` rewrite to NestJS backend.
+
+### FE-02 — Module pages
+- Priority: P1 · Status: **Not started** — users, employees, documents, masters list/detail pages.
+
 ## DEV — Implementation (Phase 3 — active)
 
 ### DEV-01 — NestJS modular monolith scaffold
