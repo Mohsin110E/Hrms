@@ -21,11 +21,13 @@
 | Users module | **Implemented (first pass)** — `src/users/*`: CRUD, list/search/pagination, admin reset-password, deactivation, audit logging |
 | RBAC module | **Implemented (first pass)** — `src/rbac/*`: menu tree, user-type permissions, per-user overrides, effective `my-menu` |
 | Masters module | **Implemented (first pass)** — `src/masters/*`: department/site/language/shift/document-type CRUD, parameter catalog, metadata definitions |
+| Employees module | **Implemented (first pass)** — `src/employees/*`: CRUD, dependants, photo upload, PII encryption/hashing (D-015) |
+| Documents module | **Implemented (first pass)** — `src/documents/*`: CRUD, private file upload/download, expiry scheduler (D-017/D-008) |
 | Seed scripts | **Done (first pass)** — `prisma/seed.ts` for lookup tables (parameters, messages, config, user types, roles, document types, menu items) |
 | Data migration plan | **In progress** (D-014/D-016 incorporated; reconciliation and storage decisions remain) |
 | Security review | **Reviewed** (source + DB-level findings SEC-L-15..19; see SECURITY_REVIEW.md) |
 | Test strategy | **In progress** (draft proposal) |
-| Implementation (Phase 3) | **In progress** — auth vertical slice and seeds complete; users/RBAC/masters/employees/documents pending |
+| Implementation (Phase 3) | **Implemented (first pass)** — all Phase-1 API modules complete; migration, tests, and frontend pending |
 
 Status vocabulary: Not started / In progress / Reviewed / Validated / Approved / Implemented / Tested.
 "Reviewed" = source surveyed with citations but not executed/verified against a running system or DB.
@@ -142,7 +144,8 @@ Top items (full list in OPEN_QUESTIONS.md):
 
 ## Next recommended actions (priority order)
 
-1. **Implement the Employees module**: employee/profile CRUD, dependants, photo upload, PII encryption/hashing (D-015).
-2. **Implement the Documents module**: document CRUD, private file upload/download, expiry scheduler (D-017/D-008).
-3. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
-4. Produce the MIG-04 reconciliation report before any ETL or migration work.
+1. **Run Prisma migration against a local PostgreSQL instance** and verify seed scripts populate lookup tables cleanly.
+2. **Integration/API smoke tests** — test auth, users, employees, documents end-to-end with a real DB.
+3. **Scaffold the Next.js frontend** (app router recommended) and wire it to the API.
+4. Create dedicated `hrms_ro` SQL login for remaining/future DB reads; rotate exposed credentials (SEC-L-08/19).
+5. Produce the MIG-04 reconciliation report before any ETL or migration work.

@@ -695,6 +695,7 @@ model Employee {
   personIdNumberHash     String?
   designation            String?
   shiftId                Int?
+  isActive               Boolean   @default(true)
   exitUploadId           Int?
   // ---- OUT-OF-SCOPE columns kept for parity (payroll/attendance domain) ----
   isWPSProcessing        Boolean?

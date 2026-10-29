@@ -198,10 +198,10 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Priority: P1 · Status: **Implemented (first pass)** — department/site/language/shift/document-type CRUD, parameter catalog, metadata definitions list, audit logging.
 
 ### DEV-07 — Employees module
-- Priority: P1 · Status: **Not started**
+- Priority: P1 · Status: **Implemented (first pass)** — employee/profile CRUD, dependants CRUD, photo upload, PII encryption/hashing for personIdNumber (D-015), audit logging.
 
 ### DEV-08 — Documents module
-- Priority: P1 · Status: **Not started** · Depends: SEC-03/DOC-02 (file storage design)
+- Priority: P1 · Status: **Implemented (first pass)** — document CRUD, private file upload/download, expiry scheduler cron + manual run, audit logging (D-017/D-008).
 
 ## QA — Validation & release
 
