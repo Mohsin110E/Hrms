@@ -304,20 +304,24 @@ async function seedDocumentTypes() {
 async function seedMenuItems() {
   // Phase-1 relevant menu tree subset extracted from legacy menu catalog.
   const items: Array<{ id: number; name: string; parentId?: number; pageUrl?: string; iconClass?: string; displayOrder: number; isMainMenu: boolean; isActive: boolean }> = [
-    { id: 1, name: 'Employee List', parentId: 37, pageUrl: '/profilelist', iconClass: 'fa fa-users', displayOrder: 1, isMainMenu: true, isActive: true },
+    // Root menus first
+    { id: 37, name: 'Profile', iconClass: 'fa fa-book', displayOrder: 1, isMainMenu: true, isActive: true },
+    { id: 155, name: 'Profile', displayOrder: 2, isMainMenu: true, isActive: true },
     { id: 2, name: 'Master Setup', iconClass: 'fa fa-cogs', displayOrder: 2, isMainMenu: true, isActive: true },
+    // Children of Profile (37)
+    { id: 1, name: 'Employee List', parentId: 37, pageUrl: '/profilelist', iconClass: 'fa fa-users', displayOrder: 1, isMainMenu: true, isActive: true },
+    { id: 12, name: 'Document List', parentId: 37, pageUrl: '/documentlist', iconClass: 'fa fa-folder-open-o', displayOrder: 2, isMainMenu: true, isActive: true },
+    { id: 156, name: 'My Profile', parentId: 37, pageUrl: '/myprofile', iconClass: 'fa fa-user-secret', displayOrder: 3, isMainMenu: true, isActive: true },
+    // Children of Master Setup (2)
     { id: 3, name: 'Language', parentId: 2, displayOrder: 1, isMainMenu: false, isActive: true },
     { id: 4, name: 'Role', parentId: 2, displayOrder: 2, isMainMenu: false, isActive: true },
     { id: 6, name: 'Department', parentId: 2, displayOrder: 3, isMainMenu: false, isActive: true },
     { id: 7, name: 'Site', parentId: 2, displayOrder: 4, isMainMenu: false, isActive: true },
     { id: 21, name: 'Document Type', parentId: 2, displayOrder: 5, isMainMenu: false, isActive: true },
-    { id: 12, name: 'Document List', parentId: 37, pageUrl: '/documentlist', iconClass: 'fa fa-folder-open-o', displayOrder: 2, isMainMenu: true, isActive: true },
-    { id: 37, name: 'Profile', iconClass: 'fa fa-book', displayOrder: 1, isMainMenu: true, isActive: true },
-    { id: 155, name: 'Profile', displayOrder: 2, isMainMenu: true, isActive: true },
+    // Children of Profile (155)
     { id: 146, name: 'Basic & Work Details', parentId: 155, displayOrder: 1, isMainMenu: false, isActive: true },
     { id: 147, name: 'Document', parentId: 155, displayOrder: 2, isMainMenu: false, isActive: true },
     { id: 151, name: 'Dependants', parentId: 155, displayOrder: 3, isMainMenu: false, isActive: true },
-    { id: 156, name: 'My Profile', parentId: 37, pageUrl: '/myprofile', iconClass: 'fa fa-user-secret', displayOrder: 3, isMainMenu: true, isActive: true },
   ];
 
   for (const item of items) {
