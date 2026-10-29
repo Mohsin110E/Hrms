@@ -195,7 +195,7 @@ Priority: `P1 (critical) | P2 (high) | P3 (medium) | P4 (low)`
 - Priority: P1 · Status: **Implemented (first pass)** — user types, roles, menu flat/tree, menu permissions per user type, per-user overrides, effective `my-menu` tree, audit logging.
 
 ### DEV-06 — Masters module
-- Priority: P1 · Status: **Not started**
+- Priority: P1 · Status: **Implemented (first pass)** — department/site/language/shift/document-type CRUD, parameter catalog, metadata definitions list, audit logging.
 
 ### DEV-07 — Employees module
 - Priority: P1 · Status: **Not started**
