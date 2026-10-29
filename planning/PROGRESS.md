@@ -27,7 +27,8 @@
 | Data migration plan | **In progress** (D-014/D-016 incorporated; reconciliation and storage decisions remain) |
 | Security review | **Reviewed** (source + DB-level findings SEC-L-15..19; see SECURITY_REVIEW.md) |
 | Test strategy | **In progress** (draft proposal) |
-| Implementation (Phase 3) | **Implemented (first pass)** — all Phase-1 API modules complete; migration, tests, and frontend pending |
+| Local DB migration + seeds | **Done** — `prisma/migrations/20261029124942_init` applied; lookup tables seeded; admin bootstrapped; health/login/RBAC smoke-tested |
+| Implementation (Phase 3) | **Implemented (first pass)** — all Phase-1 API modules complete; frontend pending |
 
 Status vocabulary: Not started / In progress / Reviewed / Validated / Approved / Implemented / Tested.
 "Reviewed" = source surveyed with citations but not executed/verified against a running system or DB.
