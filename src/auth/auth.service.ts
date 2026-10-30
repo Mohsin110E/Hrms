@@ -10,12 +10,22 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../common/services/audit.service';
+import { EmailService } from '../common/services/email.service';
 import {
   generateSecureToken,
   sha256,
   desDecrypt,
 } from '../common/utils/crypto.util';
 import { LoginDto } from './dto/login.dto';
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
 export interface LoginResult {
   accessToken: string;
@@ -51,6 +61,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
     private readonly audit: AuditService,
+    private readonly email: EmailService,
   ) {
     this.bcryptRounds = this.config.get<number>('app.security.bcryptRounds', 12);
     this.accessTtlSeconds = this.parseTtl(
@@ -299,7 +310,18 @@ export class AuthService {
       ipAddress: ip,
     });
 
-    // TODO: send email with rawToken. The raw token is never stored.
+    const frontendBaseUrl = this.config.get<string>('app.frontendBaseUrl', 'http://localhost:3001');
+    const resetUrl = `${frontendBaseUrl}/reset-password?token=${encodeURIComponent(rawToken)}`;
+
+    await this.email.send({
+      to: user.profile.email ?? normalizedEmail,
+      subject: 'Reset your HRMS password',
+      text: `Hi ${user.profile.name || ''},\n\nYou requested a password reset. Click the link below to set a new password:\n\n${resetUrl}\n\nThis link expires in 1 hour. If you did not request this, please ignore this email.`,
+      html: `<p>Hi ${escapeHtml(user.profile.name || '')},</p>
+<p>You requested a password reset. Click the link below to set a new password:</p>
+<p><a href="${escapeHtml(resetUrl)}">${escapeHtml(resetUrl)}</a></p>
+<p>This link expires in 1 hour. If you did not request this, please ignore this email.</p>`,
+    });
   }
 
   async resetPassword(

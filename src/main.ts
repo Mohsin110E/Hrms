@@ -6,10 +6,14 @@ import compression from 'compression';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
+import { WinstonLogger } from './common/logger/winston.logger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new WinstonLogger(),
+  });
 
+  app.useLogger(app.get(WinstonLogger));
   app.use(helmet());
   app.use(compression());
   app.enableCors({ origin: process.env.CORS_ORIGIN ?? true, credentials: true });
@@ -34,6 +38,6 @@ async function bootstrap() {
 
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
   await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}/api/v1`);
+  app.get(WinstonLogger).log(`Application is running on: http://localhost:${port}/api/v1`, 'Bootstrap');
 }
 bootstrap();

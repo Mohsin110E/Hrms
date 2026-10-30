@@ -1,5 +1,5 @@
 import { IsOptional, IsInt, IsString, IsBoolean } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 export class ListDocumentsQueryDto {
   @Type(() => Number)
@@ -14,6 +14,7 @@ export class ListDocumentsQueryDto {
 
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) => value === 'true' || value === true || value === 1 || value === '1')
   isActive?: boolean;
 
   @Type(() => Number)

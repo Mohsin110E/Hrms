@@ -17,4 +17,13 @@ export default registerAs('app', () => ({
     maxLoginAttempts: 5,
     lockoutMinutes: parseInt(process.env.LOCKOUT_MINUTES ?? '30', 10),
   },
+  email: {
+    smtpHost: process.env.SMTP_HOST ?? '',
+    smtpPort: parseInt(process.env.SMTP_PORT ?? '587', 10),
+    smtpSecure: process.env.SMTP_SECURE === 'true',
+    smtpUser: process.env.SMTP_USER ?? '',
+    smtpPass: process.env.SMTP_PASS ?? '',
+    from: process.env.EMAIL_FROM ?? 'no-reply@example.com',
+  },
+  frontendBaseUrl: process.env.FRONTEND_BASE_URL ?? 'http://localhost:3001',
 }));
