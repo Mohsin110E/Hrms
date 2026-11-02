@@ -52,13 +52,11 @@ export interface CreateUserPayload {
   password: string;
   userTypeId: number;
   profileId?: number;
-  isSiteAccess?: boolean;
 }
 
 export interface UpdateUserPayload {
   userTypeId?: number;
   isActive?: boolean;
-  isSiteAccess?: boolean;
 }
 
 export interface Dependant {

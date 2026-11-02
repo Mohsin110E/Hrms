@@ -27,14 +27,12 @@ export default function UsersPage() {
     username: '',
     password: '',
     userTypeId: '',
-    isSiteAccess: true,
   });
 
   // Edit form state
   const [editForm, setEditForm] = useState({
     userTypeId: '',
     isActive: true,
-    isSiteAccess: true,
   });
 
   useEffect(() => {
@@ -64,7 +62,6 @@ export default function UsersPage() {
     setEditForm({
       userTypeId: String(u.userTypeId || ''),
       isActive: u.isActive,
-      isSiteAccess: u.profile?.isSiteAccess ?? true,
     });
   };
 
@@ -75,10 +72,9 @@ export default function UsersPage() {
         username: form.username,
         password: form.password,
         userTypeId: parseInt(form.userTypeId, 10),
-        isSiteAccess: form.isSiteAccess,
       });
       setShowCreate(false);
-      setForm({ username: '', password: '', userTypeId: '', isSiteAccess: true });
+      setForm({ username: '', password: '', userTypeId: '' });
       loadUsers();
     } catch (err: any) {
       setError(err.message || 'Failed to create user');
@@ -92,7 +88,6 @@ export default function UsersPage() {
       await updateUser(editingUser.id, {
         userTypeId: editForm.userTypeId ? parseInt(editForm.userTypeId, 10) : undefined,
         isActive: editForm.isActive,
-        isSiteAccess: editForm.isSiteAccess,
       });
       setEditingUser(null);
       loadUsers();
@@ -292,16 +287,6 @@ export default function UsersPage() {
                 </select>
               </div>
 
-              <label className="flex items-center gap-2 text-sm text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={form.isSiteAccess}
-                  onChange={(e) => setForm({ ...form, isSiteAccess: e.target.checked })}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                Site access
-              </label>
-
               <div className="flex justify-end gap-3 pt-4">
                 <button
                   type="button"
@@ -349,26 +334,15 @@ export default function UsersPage() {
                 </select>
               </div>
 
-              <div className="flex gap-6">
-                <label className="flex items-center gap-2 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={editForm.isActive}
-                    onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  Active
-                </label>
-                <label className="flex items-center gap-2 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    checked={editForm.isSiteAccess}
-                    onChange={(e) => setEditForm({ ...editForm, isSiteAccess: e.target.checked })}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  Site access
-                </label>
-              </div>
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={editForm.isActive}
+                  onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                Active
+              </label>
 
               <div className="flex justify-end gap-3 pt-4">
                 <button

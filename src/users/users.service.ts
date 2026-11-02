@@ -165,7 +165,7 @@ export class UsersService {
       const profile = await this.prisma.profile.create({
         data: {
           name: normalizedUsername,
-          isSiteAccess: dto.isSiteAccess ?? true,
+          isSiteAccess: true,
         },
       });
       profileId = profile.id;
@@ -226,9 +226,6 @@ export class UsersService {
     }
     if (dto.isActive !== undefined) {
       data.isActive = dto.isActive;
-    }
-    if (dto.isSiteAccess !== undefined) {
-      data.profile = { update: { isSiteAccess: dto.isSiteAccess } };
     }
 
     const updated = await this.prisma.user.update({

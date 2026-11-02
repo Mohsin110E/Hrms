@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsInt,
-  IsBoolean,
   MinLength,
   MaxLength,
   Matches,
@@ -34,8 +33,4 @@ export class CreateUserDto {
   @IsOptional()
   @IsInt()
   profileId?: number;
-
-  @IsOptional()
-  @IsBoolean()
-  isSiteAccess?: boolean;
 }
