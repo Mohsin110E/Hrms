@@ -1,4 +1,9 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000/api/v1';
+// Vercel service binding is available at runtime in server functions only.
+// Browser requests use the same-origin /api/v1 path that Vercel rewrites to the backend service.
+export const API_BASE_URL =
+  typeof window === 'undefined'
+    ? (process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:3000/api/v1')
+    : (process.env.NEXT_PUBLIC_API_BASE_URL || '/api/v1');
 
 export interface ApiEnvelope<T> {
   data: T;
