@@ -1,11 +1,4 @@
-import {
-  IsInt,
-  IsOptional,
-  IsBoolean,
-  IsString,
-  IsEmail,
-  MaxLength,
-} from 'class-validator';
+import { IsInt, IsOptional, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateUserDto {
@@ -17,27 +10,6 @@ export class UpdateUserDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
-
-  // Profile fields
-  @IsString()
-  @IsOptional()
-  @MaxLength(100)
-  firstName?: string;
-
-  @IsString()
-  @IsOptional()
-  @MaxLength(100)
-  lastName?: string;
-
-  @IsEmail()
-  @IsOptional()
-  @MaxLength(100)
-  email?: string;
-
-  @IsString()
-  @IsOptional()
-  @MaxLength(30)
-  contactNo?: string;
 
   @IsOptional()
   @IsBoolean()

@@ -52,20 +52,12 @@ export interface CreateUserPayload {
   password: string;
   userTypeId: number;
   profileId?: number;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  contactNo?: string;
   isSiteAccess?: boolean;
 }
 
 export interface UpdateUserPayload {
   userTypeId?: number;
   isActive?: boolean;
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  contactNo?: string;
   isSiteAccess?: boolean;
 }
 

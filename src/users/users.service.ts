@@ -162,23 +162,9 @@ export class UsersService {
         throw new ConflictException('A user already exists for this profile');
       }
     } else {
-      if (!dto.firstName || !dto.email) {
-        throw new BadRequestException('firstName and email are required when profileId is not provided');
-      }
-
-      const emailTaken = await this.prisma.profile.findFirst({
-        where: { email: dto.email.toLowerCase() },
-      });
-      if (emailTaken) {
-        throw new ConflictException('Email already exists');
-      }
-
       const profile = await this.prisma.profile.create({
         data: {
-          name: dto.firstName.trim(),
-          lastName: dto.lastName?.trim() ?? null,
-          email: dto.email.toLowerCase(),
-          contactNo: dto.contactNo?.trim() ?? null,
+          name: normalizedUsername,
           isSiteAccess: dto.isSiteAccess ?? true,
         },
       });
@@ -234,38 +220,6 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const profileUpdate: Prisma.ProfileUpdateInput = {};
-    if (dto.firstName !== undefined) {
-      profileUpdate.name = dto.firstName.trim();
-    }
-    if (dto.lastName !== undefined) {
-      profileUpdate.lastName = dto.lastName.trim() || null;
-    }
-    if (dto.contactNo !== undefined) {
-      profileUpdate.contactNo = dto.contactNo.trim() || null;
-    }
-    if (dto.isSiteAccess !== undefined) {
-      profileUpdate.isSiteAccess = dto.isSiteAccess;
-    }
-
-    if (dto.email !== undefined) {
-      const normalizedEmail = dto.email.toLowerCase().trim();
-      if (
-        normalizedEmail &&
-        normalizedEmail !== user.profile.email?.toLowerCase()
-      ) {
-        const emailExists = await this.prisma.profile.findFirst({
-          where: { email: normalizedEmail },
-        });
-        if (emailExists) {
-          throw new ConflictException('Email already exists');
-        }
-      }
-      profileUpdate.email = normalizedEmail || null;
-    }
-
-    const hasProfileChanges = Object.keys(profileUpdate).length > 0;
-
     const data: Prisma.UserUpdateInput = {};
     if (dto.userTypeId !== undefined) {
       data.userType = { connect: { id: dto.userTypeId } };
@@ -273,8 +227,8 @@ export class UsersService {
     if (dto.isActive !== undefined) {
       data.isActive = dto.isActive;
     }
-    if (hasProfileChanges) {
-      data.profile = { update: profileUpdate };
+    if (dto.isSiteAccess !== undefined) {
+      data.profile = { update: { isSiteAccess: dto.isSiteAccess } };
     }
 
     const updated = await this.prisma.user.update({

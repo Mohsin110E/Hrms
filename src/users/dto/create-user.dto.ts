@@ -1,7 +1,6 @@
 import {
   IsString,
   IsNotEmpty,
-  IsEmail,
   IsOptional,
   IsInt,
   IsBoolean,
@@ -36,24 +35,7 @@ export class CreateUserDto {
   @IsInt()
   profileId?: number;
 
-  @IsString()
   @IsOptional()
-  @IsNotEmpty()
-  firstName?: string;
-
-  @IsString()
-  @IsOptional()
-  lastName?: string;
-
-  @IsEmail()
-  @IsOptional()
-  email?: string;
-
-  @IsString()
-  @IsOptional()
-  @MaxLength(30)
-  contactNo?: string;
-
-  @IsOptional()
+  @IsBoolean()
   isSiteAccess?: boolean;
 }
