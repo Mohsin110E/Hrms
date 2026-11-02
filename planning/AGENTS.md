@@ -22,6 +22,15 @@ Phase-1 scope is limited to three modules:
 Everything else (leave, payroll, muster, reports, Excel import) is out of scope until those
 modules are approved.
 
+## 1.5 Cross-stack review rule
+
+**Before writing or changing any feature, review both the legacy backend source and the legacy frontend source for that feature, then review the current new backend and frontend.**
+
+- Read the relevant legacy controller/service/DTO/manager (e.g. `*.cs`) and the matching legacy UI/template (e.g. `*.html`, `*.js`).
+- Read the current NestJS DTO/service/controller and the current Next.js page/components/API client.
+- Only then make changes. This prevents mismatched fields, missing dropdowns, and orphaned UI controls.
+- Summarize the mapping (legacy field → new field, legacy dropdown → new lookup/parameter) in the task notes or `planning/DATABASE_DISCOVERY.md`/`BUSINESS_RULES.md` when the gap is non-trivial.
+
 ## 2. Mandatory read-only restrictions
 
 ### 2.1 Legacy repository (`D:\.net\hrms`)
