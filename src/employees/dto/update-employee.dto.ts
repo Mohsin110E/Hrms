@@ -62,11 +62,25 @@ export class UpdateEmployeeDto {
   @Type(() => Number)
   @IsOptional()
   @IsInt()
+  visaTypeId?: number;
+
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
   motherTongueId?: number;
 
   @IsString()
   @IsOptional()
   address?: string;
+
+  @IsString()
+  @IsOptional()
+  homeCountryAddress?: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(30)
+  homeCountryPhoneNo?: string;
 
   @IsString()
   @IsOptional()
@@ -134,6 +148,15 @@ export class UpdateEmployeeDto {
   @IsDateString()
   @IsOptional()
   dateOfConfirmation?: string;
+
+  @IsDateString()
+  @IsOptional()
+  dateOfExit?: string;
+
+  @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  exitReasonCode?: number;
 
   @IsString()
   @IsOptional()

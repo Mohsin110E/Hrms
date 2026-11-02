@@ -164,9 +164,14 @@ export class EmployeesService {
       genderId: dto.genderId ?? null,
       bloodGroupId: dto.bloodGroupId ?? null,
       nationalityId: dto.nationalityId ?? null,
+      visaTypeId: dto.visaTypeId ?? null,
       motherTongueId: dto.motherTongueId ?? null,
       address: dto.address ?? null,
+      homeCountryAddress: dto.homeCountryAddress ?? null,
+      homeCountryPhoneNo: dto.homeCountryPhoneNo ?? null,
       qualification: dto.qualification ?? null,
+      dateOfExit: dto.dateOfExit ? new Date(dto.dateOfExit) : null,
+      exitReasonCode: dto.exitReasonCode ?? null,
       isSiteAccess: dto.isSiteAccess ?? false,
     };
 
@@ -280,9 +285,14 @@ export class EmployeesService {
     if (dto.genderId !== undefined) profileUpdate.genderId = dto.genderId ?? null;
     if (dto.bloodGroupId !== undefined) profileUpdate.bloodGroupId = dto.bloodGroupId ?? null;
     if (dto.nationalityId !== undefined) profileUpdate.nationalityId = dto.nationalityId ?? null;
+    if (dto.visaTypeId !== undefined) profileUpdate.visaTypeId = dto.visaTypeId ?? null;
     if (dto.motherTongueId !== undefined) profileUpdate.motherTongueId = dto.motherTongueId ?? null;
     if (dto.address !== undefined) profileUpdate.address = dto.address ?? null;
+    if (dto.homeCountryAddress !== undefined) profileUpdate.homeCountryAddress = dto.homeCountryAddress ?? null;
+    if (dto.homeCountryPhoneNo !== undefined) profileUpdate.homeCountryPhoneNo = dto.homeCountryPhoneNo ?? null;
     if (dto.qualification !== undefined) profileUpdate.qualification = dto.qualification ?? null;
+    if (dto.dateOfExit !== undefined) profileUpdate.dateOfExit = dto.dateOfExit ? new Date(dto.dateOfExit) : null;
+    if (dto.exitReasonCode !== undefined) profileUpdate.exitReasonCode = dto.exitReasonCode ?? null;
     if (dto.isSiteAccess !== undefined) profileUpdate.isSiteAccess = dto.isSiteAccess;
 
     const employeeUpdate: Prisma.EmployeeUncheckedUpdateInput = {};

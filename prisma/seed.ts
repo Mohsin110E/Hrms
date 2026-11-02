@@ -116,6 +116,31 @@ async function seedParameterTypesAndParameters() {
       { id: 137, text: '90 Days', value: 90, order: 5, visible: true },
       { id: 138, text: 'More than 90 Days', value: 91, order: 6, visible: true },
     ]},
+    19: { name: 'Nationality', parameters: [
+      { id: 200, text: 'Indian', value: 1, order: 1, visible: true },
+      { id: 201, text: 'Pakistani', value: 2, order: 2, visible: true },
+      { id: 202, text: 'Filipino', value: 3, order: 3, visible: true },
+      { id: 203, text: 'Emirati', value: 4, order: 4, visible: true },
+      { id: 204, text: 'Other', value: 5, order: 5, visible: true },
+    ]},
+    20: { name: 'Employee Status', parameters: [
+      { id: 210, text: 'Active', value: 1, order: 1, visible: true },
+      { id: 211, text: 'On Leave', value: 2, order: 2, visible: true },
+      { id: 212, text: 'Suspended', value: 3, order: 3, visible: true },
+      { id: 213, text: 'Terminated', value: 4, order: 4, visible: true },
+    ]},
+    21: { name: 'Contract Type', parameters: [
+      { id: 220, text: 'Full Time', value: 1, order: 1, visible: true },
+      { id: 221, text: 'Part Time', value: 2, order: 2, visible: true },
+      { id: 222, text: 'Contract', value: 3, order: 3, visible: true },
+      { id: 223, text: 'Internship', value: 4, order: 4, visible: true },
+    ]},
+    22: { name: 'Visa Type', parameters: [
+      { id: 230, text: 'Employment', value: 1, order: 1, visible: true },
+      { id: 231, text: 'Residence', value: 2, order: 2, visible: true },
+      { id: 232, text: 'Visit', value: 3, order: 3, visible: true },
+      { id: 233, text: 'Tourist', value: 4, order: 4, visible: true },
+    ]},
   };
 
   for (const [typeId, group] of Object.entries(groups)) {

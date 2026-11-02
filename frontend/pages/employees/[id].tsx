@@ -7,6 +7,7 @@ import {
   CreateEmployeePayload,
   UpdateEmployeePayload,
   getEmployee,
+  getEmployees,
   createEmployee,
   updateEmployee,
   getDepartments,
@@ -61,9 +62,14 @@ export default function EmployeeDetailPage() {
     genderId: undefined,
     bloodGroupId: undefined,
     nationalityId: undefined,
+    visaTypeId: undefined,
     motherTongueId: undefined,
     address: '',
+    homeCountryAddress: '',
+    homeCountryPhoneNo: '',
     qualification: '',
+    dateOfExit: '',
+    exitReasonCode: undefined,
     employeeCode: '',
     reportingToId: undefined,
     sourceOfHireId: undefined,
@@ -95,6 +101,12 @@ export default function EmployeeDetailPage() {
   const [sourceOfHires, setSourceOfHires] = useState<{ id: number; text: string }[]>([]);
   const [locations, setLocations] = useState<{ id: number; text: string }[]>([]);
   const [employeeTypes, setEmployeeTypes] = useState<{ id: number; text: string }[]>([]);
+  const [employeeStatuses, setEmployeeStatuses] = useState<{ id: number; text: string }[]>([]);
+  const [contractTypes, setContractTypes] = useState<{ id: number; text: string }[]>([]);
+  const [exitReasons, setExitReasons] = useState<{ id: number; text: string }[]>([]);
+  const [nationalities, setNationalities] = useState<{ id: number; text: string }[]>([]);
+  const [visaTypes, setVisaTypes] = useState<{ id: number; text: string }[]>([]);
+  const [reportingTos, setReportingTos] = useState<{ id: number; employeeCode: string; profile: { name: string; lastName?: string } }[]>([]);
   const [relationTypes, setRelationTypes] = useState<{ id: number; text: string }[]>([]);
   const [documentTypes, setDocumentTypes] = useState<{ id: number; name: string }[]>([]);
 
@@ -125,9 +137,15 @@ export default function EmployeeDetailPage() {
         ms,
         g,
         bg,
+        nat,
+        vt,
         soh,
         loc,
         et,
+        es,
+        ct,
+        er,
+        emps,
         rt,
         dt,
       ] = await Promise.all([
@@ -138,9 +156,15 @@ export default function EmployeeDetailPage() {
         getParameters('Marital Status'),
         getParameters('Gender'),
         getParameters('BloodGroup'),
+        getParameters('Nationality'),
+        getParameters('Visa Type'),
         getParameters('Source of hire'),
         getParameters('Location'),
         getParameters('Employee Type'),
+        getParameters('Employee Status'),
+        getParameters('Contract Type'),
+        getParameters('ExitReason'),
+        getEmployees({ isActive: true, pageSize: 100 }),
         getParameters('Dependant Relation'),
         getDocumentTypes(),
       ]);
@@ -151,9 +175,15 @@ export default function EmployeeDetailPage() {
       setMaritalStatuses(ms.data);
       setGenders(g.data);
       setBloodGroups(bg.data);
+      setNationalities(nat.data);
+      setVisaTypes(vt.data);
       setSourceOfHires(soh.data);
       setLocations(loc.data);
       setEmployeeTypes(et.data);
+      setEmployeeStatuses(es.data);
+      setContractTypes(ct.data);
+      setExitReasons(er.data);
+      setReportingTos(emps.data);
       setRelationTypes(rt.data);
       setDocumentTypes(dt.data);
     } catch (err: any) {
@@ -178,9 +208,14 @@ export default function EmployeeDetailPage() {
         genderId: emp.profile?.genderId,
         bloodGroupId: emp.profile?.bloodGroupId,
         nationalityId: emp.profile?.nationalityId,
+        visaTypeId: emp.profile?.visaTypeId,
         motherTongueId: emp.profile?.motherTongueId,
         address: emp.profile?.address || '',
+        homeCountryAddress: emp.profile?.homeCountryAddress || '',
+        homeCountryPhoneNo: emp.profile?.homeCountryPhoneNo || '',
         qualification: emp.profile?.qualification || '',
+        dateOfExit: formatDateInput(emp.profile?.dateOfExit),
+        exitReasonCode: emp.profile?.exitReasonCode,
         employeeCode: emp.employeeCode || '',
         reportingToId: emp.reportingToId,
         sourceOfHireId: emp.sourceOfHireId,
@@ -384,13 +419,23 @@ export default function EmployeeDetailPage() {
                 <Select label="Marital Status" value={form.maritalStatusId || ''} options={maritalStatuses.map((p) => ({ value: p.id, label: p.text }))} onChange={(v) => handleChange('maritalStatusId', v ? parseInt(v, 10) : undefined)} />
                 <Select label="Gender" value={form.genderId || ''} options={genders.map((p) => ({ value: p.id, label: p.text }))} onChange={(v) => handleChange('genderId', v ? parseInt(v, 10) : undefined)} />
                 <Select label="Blood Group" value={form.bloodGroupId || ''} options={bloodGroups.map((p) => ({ value: p.id, label: p.text }))} onChange={(v) => handleChange('bloodGroupId', v ? parseInt(v, 10) : undefined)} />
-                <Input label="Nationality ID" value={String(form.nationalityId || '')} onChange={(v) => handleChange('nationalityId', v ? parseInt(v, 10) : undefined)} />
+                <Select label="Nationality" value={form.nationalityId || ''} options={nationalities.map((p) => ({ value: p.id, label: p.text }))} onChange={(v) => handleChange('nationalityId', v ? parseInt(v, 10) : undefined)} />
+                <Select label="Visa Type" value={form.visaTypeId || ''} options={visaTypes.map((p) => ({ value: p.id, label: p.text }))} onChange={(v) => handleChange('visaTypeId', v ? parseInt(v, 10) : undefined)} />
                 <Select label="Mother Tongue" value={form.motherTongueId || ''} options={languages.map((l) => ({ value: l.id, label: l.name }))} onChange={(v) => handleChange('motherTongueId', v ? parseInt(v, 10) : undefined)} />
                 <Input label="Qualification" value={form.qualification || ''} onChange={(v) => handleChange('qualification', v)} />
               </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                  <textarea value={form.address || ''} onChange={(e) => handleChange('address', e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" rows={3} />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Home Country Address</label>
+                  <textarea value={form.homeCountryAddress || ''} onChange={(e) => handleChange('homeCountryAddress', e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" rows={3} />
+                </div>
+              </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                <textarea value={form.address || ''} onChange={(e) => handleChange('address', e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" rows={3} />
+                <Input label="Home Country Phone No" value={form.homeCountryPhoneNo || ''} onChange={(v) => handleChange('homeCountryPhoneNo', v)} />
               </div>
             </div>
           )}
@@ -412,9 +457,17 @@ export default function EmployeeDetailPage() {
                 <Select label="Employee Type" value={form.employeeTypeId || ''} options={employeeTypes.map((p) => ({ value: p.id, label: p.text }))} onChange={(v) => handleChange('employeeTypeId', v ? parseInt(v, 10) : undefined)} />
                 <Select label="Source of Hire" value={form.sourceOfHireId || ''} options={sourceOfHires.map((p) => ({ value: p.id, label: p.text }))} onChange={(v) => handleChange('sourceOfHireId', v ? parseInt(v, 10) : undefined)} />
                 <Select label="Location" value={form.locationId || ''} options={locations.map((p) => ({ value: p.id, label: p.text }))} onChange={(v) => handleChange('locationId', v ? parseInt(v, 10) : undefined)} />
-                <Input label="Reporting To ID" value={String(form.reportingToId || '')} onChange={(v) => handleChange('reportingToId', v ? parseInt(v, 10) : undefined)} />
-                <Input label="Employee Status ID" value={String(form.employeeStatusId || '')} onChange={(v) => handleChange('employeeStatusId', v ? parseInt(v, 10) : undefined)} />
-                <Input label="Contract Type ID" value={String(form.contractTypeId || '')} onChange={(v) => handleChange('contractTypeId', v ? parseInt(v, 10) : undefined)} />
+                <Select label="Reporting To" value={form.reportingToId || ''} options={reportingTos.map((e) => ({ value: e.id, label: `${e.employeeCode} - ${e.profile?.name} ${e.profile?.lastName || ''}`.trim() }))} onChange={(v) => handleChange('reportingToId', v ? parseInt(v, 10) : undefined)} />
+                <Select label="Employee Status" value={form.employeeStatusId || ''} options={employeeStatuses.map((p) => ({ value: p.id, label: p.text }))} onChange={(v) => handleChange('employeeStatusId', v ? parseInt(v, 10) : undefined)} />
+                <Select label="Contract Type" value={form.contractTypeId || ''} options={contractTypes.map((p) => ({ value: p.id, label: p.text }))} onChange={(v) => handleChange('contractTypeId', v ? parseInt(v, 10) : undefined)} />
+              </div>
+
+              <div className="border-t border-gray-200 pt-4">
+                <h4 className="text-md font-semibold text-gray-900 mb-3">Exit Details</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <Input type="date" label="Date of Exit" value={form.dateOfExit || ''} onChange={(v) => handleChange('dateOfExit', v)} />
+                  <Select label="Exit Reason" value={form.exitReasonCode || ''} options={exitReasons.map((p) => ({ value: p.id, label: p.text }))} onChange={(v) => handleChange('exitReasonCode', v ? parseInt(v, 10) : undefined)} />
+                </div>
               </div>
 
               <div>
