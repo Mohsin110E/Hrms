@@ -8,7 +8,7 @@ import {
   MinLength,
   MaxLength,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 export class UpdateEmployeeDto {
   @IsString()
@@ -151,7 +151,25 @@ export class UpdateEmployeeDto {
 
   @IsOptional()
   @IsBoolean()
+  @Transform(({ value }) =>
+    value === 'true' || value === true || value === 1 || value === '1'
+      ? true
+      : value === 'false' || value === false || value === 0 || value === '0'
+      ? false
+      : value,
+  )
   isActive?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) =>
+    value === 'true' || value === true || value === 1 || value === '1'
+      ? true
+      : value === 'false' || value === false || value === 0 || value === '0'
+      ? false
+      : value,
+  )
+  isSiteAccess?: boolean;
 
   @Type(() => Number)
   @IsInt({ each: true })

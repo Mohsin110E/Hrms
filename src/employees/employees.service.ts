@@ -283,6 +283,7 @@ export class EmployeesService {
     if (dto.motherTongueId !== undefined) profileUpdate.motherTongueId = dto.motherTongueId ?? null;
     if (dto.address !== undefined) profileUpdate.address = dto.address ?? null;
     if (dto.qualification !== undefined) profileUpdate.qualification = dto.qualification ?? null;
+    if (dto.isSiteAccess !== undefined) profileUpdate.isSiteAccess = dto.isSiteAccess;
 
     const employeeUpdate: Prisma.EmployeeUncheckedUpdateInput = {};
     if (dto.employeeCode !== undefined) employeeUpdate.employeeCode = dto.employeeCode.trim();
