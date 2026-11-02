@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../lib/auth';
-import { getUsers, createUser, deactivateUser, resetUserPassword, User, getUserTypes } from '../lib/api';
+import {
+  getUsers,
+  createUser,
+  updateUser,
+  deactivateUser,
+  resetUserPassword,
+  User,
+  getUserTypes,
+} from '../lib/api';
 
 export default function UsersPage() {
   const { isAuthenticated } = useAuth();
@@ -11,6 +19,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCreate, setShowCreate] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [userTypes, setUserTypes] = useState<{ id: number; name: string }[]>([]);
 
   // Create form state
@@ -21,6 +30,19 @@ export default function UsersPage() {
     firstName: '',
     lastName: '',
     email: '',
+    contactNo: '',
+    isSiteAccess: false,
+  });
+
+  // Edit form state
+  const [editForm, setEditForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    contactNo: '',
+    userTypeId: '',
+    isActive: true,
+    isSiteAccess: false,
   });
 
   useEffect(() => {
@@ -45,6 +67,19 @@ export default function UsersPage() {
     }
   };
 
+  const openEdit = (u: User) => {
+    setEditingUser(u);
+    setEditForm({
+      firstName: u.profile?.name || '',
+      lastName: u.profile?.lastName || '',
+      email: u.profile?.email || '',
+      contactNo: u.profile?.contactNo || '',
+      userTypeId: String(u.userTypeId || ''),
+      isActive: u.isActive,
+      isSiteAccess: u.profile?.isSiteAccess ?? false,
+    });
+  };
+
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -55,12 +90,43 @@ export default function UsersPage() {
         firstName: form.firstName,
         lastName: form.lastName,
         email: form.email,
+        contactNo: form.contactNo,
+        isSiteAccess: form.isSiteAccess,
       });
       setShowCreate(false);
-      setForm({ username: '', password: '', userTypeId: '', firstName: '', lastName: '', email: '' });
+      setForm({
+        username: '',
+        password: '',
+        userTypeId: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+        contactNo: '',
+        isSiteAccess: false,
+      });
       loadUsers();
     } catch (err: any) {
       setError(err.message || 'Failed to create user');
+    }
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUser) return;
+    try {
+      await updateUser(editingUser.id, {
+        firstName: editForm.firstName,
+        lastName: editForm.lastName,
+        email: editForm.email || undefined,
+        contactNo: editForm.contactNo || undefined,
+        userTypeId: editForm.userTypeId ? parseInt(editForm.userTypeId, 10) : undefined,
+        isActive: editForm.isActive,
+        isSiteAccess: editForm.isSiteAccess,
+      });
+      setEditingUser(null);
+      loadUsers();
+    } catch (err: any) {
+      setError(err.message || 'Failed to update user');
     }
   };
 
@@ -166,6 +232,12 @@ export default function UsersPage() {
                   </td>
                   <td className="px-6 py-4 text-right space-x-2">
                     <button
+                      onClick={() => openEdit(u)}
+                      className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                    >
+                      Edit
+                    </button>
+                    <button
                       onClick={() => handleResetPassword(u.id)}
                       className="text-blue-600 hover:text-blue-800 text-xs font-medium"
                     >
@@ -211,9 +283,10 @@ export default function UsersPage() {
         </div>
       )}
 
+      {/* Create modal */}
       {showCreate && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Create User</h3>
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -275,15 +348,35 @@ export default function UsersPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Contact No</label>
+                  <input
+                    value={form.contactNo}
+                    onChange={(e) => setForm({ ...form, contactNo: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
               </div>
+
+              <label className="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={form.isSiteAccess}
+                  onChange={(e) => setForm({ ...form, isSiteAccess: e.target.checked })}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                Site access
+              </label>
 
               <div className="flex justify-end gap-3 pt-4">
                 <button
@@ -298,6 +391,114 @@ export default function UsersPage() {
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
                 >
                   Create
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit modal */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Edit User</h3>
+            <form onSubmit={handleUpdate} className="space-y-4">
+              <div className="text-sm text-gray-500 mb-2">
+                Username: <span className="font-medium text-gray-900">{editingUser.username}</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <input
+                    required
+                    value={editForm.firstName}
+                    onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <input
+                    value={editForm.lastName}
+                    onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Contact No</label>
+                  <input
+                    value={editForm.contactNo}
+                    onChange={(e) => setEditForm({ ...editForm, contactNo: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">User Type</label>
+                <select
+                  required
+                  value={editForm.userTypeId}
+                  onChange={(e) => setEditForm({ ...editForm, userTypeId: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                >
+                  <option value="">Select user type</option>
+                  {userTypes.map((ut) => (
+                    <option key={ut.id} value={ut.id}>
+                      {ut.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex gap-6">
+                <label className="flex items-center gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={editForm.isActive}
+                    onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  Active
+                </label>
+                <label className="flex items-center gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={editForm.isSiteAccess}
+                    onChange={(e) => setEditForm({ ...editForm, isSiteAccess: e.target.checked })}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  Site access
+                </label>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setEditingUser(null)}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+                >
+                  Save Changes
                 </button>
               </div>
             </form>

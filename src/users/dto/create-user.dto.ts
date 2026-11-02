@@ -4,6 +4,7 @@ import {
   IsEmail,
   IsOptional,
   IsInt,
+  IsBoolean,
   MinLength,
   MaxLength,
   Matches,
@@ -47,4 +48,12 @@ export class CreateUserDto {
   @IsEmail()
   @IsOptional()
   email?: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(30)
+  contactNo?: string;
+
+  @IsOptional()
+  isSiteAccess?: boolean;
 }

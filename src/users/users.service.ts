@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../common/services/audit.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -177,7 +178,8 @@ export class UsersService {
           name: dto.firstName.trim(),
           lastName: dto.lastName?.trim() ?? null,
           email: dto.email.toLowerCase(),
-          isSiteAccess: true,
+          contactNo: dto.contactNo?.trim() ?? null,
+          isSiteAccess: dto.isSiteAccess ?? true,
         },
       });
       profileId = profile.id;
@@ -224,17 +226,60 @@ export class UsersService {
   }
 
   async update(id: number, dto: UpdateUserDto, actorProfileId?: number, ip?: string) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { profile: true },
+    });
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
+    const profileUpdate: Prisma.ProfileUpdateInput = {};
+    if (dto.firstName !== undefined) {
+      profileUpdate.name = dto.firstName.trim();
+    }
+    if (dto.lastName !== undefined) {
+      profileUpdate.lastName = dto.lastName.trim() || null;
+    }
+    if (dto.contactNo !== undefined) {
+      profileUpdate.contactNo = dto.contactNo.trim() || null;
+    }
+    if (dto.isSiteAccess !== undefined) {
+      profileUpdate.isSiteAccess = dto.isSiteAccess;
+    }
+
+    if (dto.email !== undefined) {
+      const normalizedEmail = dto.email.toLowerCase().trim();
+      if (
+        normalizedEmail &&
+        normalizedEmail !== user.profile.email?.toLowerCase()
+      ) {
+        const emailExists = await this.prisma.profile.findFirst({
+          where: { email: normalizedEmail },
+        });
+        if (emailExists) {
+          throw new ConflictException('Email already exists');
+        }
+      }
+      profileUpdate.email = normalizedEmail || null;
+    }
+
+    const hasProfileChanges = Object.keys(profileUpdate).length > 0;
+
+    const data: Prisma.UserUpdateInput = {};
+    if (dto.userTypeId !== undefined) {
+      data.userType = { connect: { id: dto.userTypeId } };
+    }
+    if (dto.isActive !== undefined) {
+      data.isActive = dto.isActive;
+    }
+    if (hasProfileChanges) {
+      data.profile = { update: profileUpdate };
+    }
+
     const updated = await this.prisma.user.update({
       where: { id },
-      data: {
-        ...(dto.userTypeId !== undefined && { userTypeId: dto.userTypeId }),
-        ...(dto.isActive !== undefined && { isActive: dto.isActive }),
-      },
+      data,
       include: {
         profile: {
           select: {
